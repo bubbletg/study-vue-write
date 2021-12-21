@@ -5,30 +5,32 @@ let vm = new Vue({
   data() {
     return {
       msg: "hello world",
+      abc: "1111",
       school: {
         name: "bubbletg",
         age: 10
       },
-      arr: [{a:1},1, 2, 3]
+      arr: [{ a: 1 }, 1, 2, 3]
     }
   },
   computed: {},
-  watch: {}
+  watch: {
+    abc: {
+      immediate: true,
+      handler(newValue, oldVaule) {
+        console.log("~~~~~~~~~~~~~watch执行了", newValue, oldVaule)
+      }
+    },
+    msg(newValue, oldVaule) {
+      console.log("~~~~~~~~~~~~~watch执行了", newValue, oldVaule)
+    }
+  }
 })
 
-console.log(vm);
-
-console.log(vm.arr[0]['a'] ='1111111')
-console.log(vm.arr[0])
-
-// vm.arr.splice(0,1,{b:'11111'})
-vm.arr.push({ab:'11111'})
-console.log(vm.arr);
-
-
 setTimeout(() => {
-  vm.msg = '1111111'
-  vm.msg = '2'
-  vm.msg = '3'
-  vm.msg = '9'
-},1000)
+  vm.msg = "1111111"
+  vm.msg = "2"
+  vm.msg = "3"
+  vm.msg = "9"
+  vm.abc = 1
+}, 1000)

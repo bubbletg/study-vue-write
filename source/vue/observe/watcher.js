@@ -1,4 +1,5 @@
 import Dep, { popTarget, pushTarget } from "./dep"
+import { util } from "../util"
 
 let id = 0
 class Watcher {
@@ -15,6 +16,16 @@ class Watcher {
     this.exporOrFn = exporOrFn
     if (typeof exporOrFn === "function") {
       this.getter = exporOrFn
+    } else {
+      // this.$watch 调用时候 走此逻辑
+      this.getter = function () {
+        // 将vm 上对应的表达式取出来
+        return util.getValue(vm, exporOrFn)
+      }
+    }
+    // 标识用户自己写的watcher
+    if (opts.user) {
+      this.user = true
     }
     this.cb = cb
     this.opts = opts
@@ -22,12 +33,19 @@ class Watcher {
     this.depsId = new Set()
     this.id = id++
 
-    this.get() // 默认会创建一个 Watcher ，调用此方法
+    this.immediate = opts.immediate
+    // get 第一次调用的时候是老值,第二次是新值
+    // 创建 watcher 的时候，先将表达式对应的值取出来（老值）
+    this.value = this.get() // 默认会创建一个 Watcher ，调用此方法
+    if (this.immediate) {
+      this.cb(this.value)
+    }
   }
   get() {
     pushTarget(this) // 渲染 watcher
-    this.getter() // 执行传入的函数
+    let value = this.getter() // 执行传入的函数
     popTarget()
+    return value
   }
 
   addDep(dep) {
@@ -43,7 +61,14 @@ class Watcher {
     queueWatcher(this) //
   }
   run() {
-    this.get()
+    // 拿到get 执行后的新值
+    let value = this.get()
+    // this.value 为 老值 ，这里判断新老值是否相等
+    if (this.value !== value) {
+      //  不相等说明 value 变化，执行用户watch 函数 cb
+      this.cb(value, this.value)
+    }
+    return value
   }
 }
 
@@ -79,8 +104,7 @@ function nextTick(cb) {
   let timerFunc = () => {
     flushCallbacks()
   }
-  console.log("🚀 ~ file: watcher.js ~ line 82 ~ timerFunc ~ timerFunc", timerFunc)
-  
+
   if (Promise) {
     return Promise.resolve().then(timerFunc)
   }
@@ -88,7 +112,7 @@ function nextTick(cb) {
     let observe = new MutationObserver(timerFunc)
     let textNode = document.createTextNode(1)
     observe.observe(textNode, { characterData: true })
-    textNode.textContent = 2 
+    textNode.textContent = 2
     return
   }
   if (setImmediate) {

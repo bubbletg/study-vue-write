@@ -21,7 +21,6 @@ Vue.prototype._init = function (options) {
 }
 
 Vue.prototype._update = function () {
-console.log("🚀 ~ file: index.js ~ line 24 ~ _update", '更新～～～～')
   // 用户传入的数据，去更新视图
   let vm = this
   let el = vm.$el
@@ -48,7 +47,12 @@ Vue.prototype.$mount = function () {
   }
   new Watcher(vm, updateComponent) // 渲染 Watcher
 
-  // 
+  //
+}
+
+Vue.prototype.$watch = function (expr, handler,opts) {
+  let vm = this
+  new Watcher(vm, expr, handler, { user: true ,...opts }) // 用户自己定义的watch
 }
 
 function query(el) {

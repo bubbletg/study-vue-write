@@ -1,4 +1,3 @@
-
 import Observer from "./observer"
 
 export function initState(vm) {
@@ -11,7 +10,7 @@ export function initState(vm) {
     initComputed()
   }
   if (opts.watch) {
-    initWatch()
+    initWatch(vm)
   }
 }
 function initData(vm) {
@@ -27,7 +26,23 @@ function initData(vm) {
   observe(vm._data) // 观察数据
 }
 function initComputed() {}
-function initWatch() {}
+
+function initWatch(vm) {
+  let watch = vm.$options.watch // 获取用户传入的watch 属性
+  for (let key in watch) {
+    let userDef = watch[key]
+    let handler = userDef
+    if (userDef.handler) {
+      // handler 为 watcher 的方法
+      handler = userDef.handler
+    }
+    createWatcher(vm, key, handler, { immediate: userDef.immediate })
+  }
+}
+
+function createWatcher(vm, key, handler,opts) {
+  return vm.$watch(key,handler,opts)
+}
 
 export function observe(data) {
   if (typeof data !== "object" || data == null) {
@@ -36,7 +51,8 @@ export function observe(data) {
   return new Observer(data)
 }
 
-export function proxy(vm, source, key) { // 代理数据 vm.msg = vm._data.msg
+export function proxy(vm, source, key) {
+  // 代理数据 vm.msg = vm._data.msg
   Object.defineProperty(vm, key, {
     get() {
       return vm[source][key]
