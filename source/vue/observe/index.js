@@ -1,4 +1,6 @@
 import Observer from "./observer"
+import Watcher from "./watcher"
+import Dep from './dep'
 
 export function initState(vm) {
   // 做不同的初始化
@@ -7,10 +9,10 @@ export function initState(vm) {
     initData(vm)
   }
   if (opts.computed) {
-    initComputed()
+    initComputed(vm, opts.computed)
   }
   if (opts.watch) {
-    initWatch(vm)
+    initWatch(vm, opts.watch)
   }
 }
 function initData(vm) {
@@ -25,10 +27,39 @@ function initData(vm) {
 
   observe(vm._data) // 观察数据
 }
-function initComputed() {}
 
-function initWatch(vm) {
-  let watch = vm.$options.watch // 获取用户传入的watch 属性
+function createComputedGetter(vm, key) {
+  let watcher = vm._watchersComputed[key]
+   // 计算属性 用户取值时，调用该方法
+  return function () {
+    if (watcher) {
+      // 如果 dirty 是 false ，不需要重新执行计算属性中的方法
+      if (watcher.dirty) {
+        watcher.evaluate()
+      }
+      // 这里 Dep.target/watcher 是计算属性的watcher 
+      if (Dep.target) {
+        watcher.depend()
+      }
+      return watcher.value
+    }
+  }
+}
+
+function initComputed(vm, computed) {
+  let watchers = (vm._watchersComputed = Object.create(null)) // 创建存储计算属性的watcher的对象
+  for (let key in computed) {
+    let userDef = computed[key]
+    // 新创建的时候什么也不做, 配置了 lazy dirty
+   watchers[key] = new Watcher(vm, userDef, () => {}, { lazy: true })
+    Object.defineProperty(vm, key, {
+      get: createComputedGetter(vm, key)
+    })
+  }
+}
+
+function initWatch(vm, watch) {
+  // let watch = vm.$options.watch // 获取用户传入的watch 属性
   for (let key in watch) {
     let userDef = watch[key]
     let handler = userDef
@@ -40,8 +71,10 @@ function initWatch(vm) {
   }
 }
 
-function createWatcher(vm, key, handler,opts) {
-  return vm.$watch(key,handler,opts)
+
+
+function createWatcher(vm, key, handler, opts) {
+  return vm.$watch(key, handler, opts)
 }
 
 export function observe(data) {

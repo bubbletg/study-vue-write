@@ -15,10 +15,13 @@ class Watcher {
     this.vm = vm
     this.exporOrFn = exporOrFn
     if (typeof exporOrFn === "function") {
+        console.log("exporOrFn，typeof exporOrFn === 'function'", exporOrFn)
+
       this.getter = exporOrFn
     } else {
-      // this.$watch 调用时候 走此逻辑
+      // this.$watch/计算属性 调用时候 走此逻辑
       this.getter = function () {
+        console.log("exporOrFn",exporOrFn)
         // 将vm 上对应的表达式取出来
         return util.getValue(vm, exporOrFn)
       }
@@ -27,23 +30,28 @@ class Watcher {
     if (opts.user) {
       this.user = true
     }
+    // lazy  = true 表明这个watcher 是个计算属性
+    this.lazy = opts.lazy
+    // dirty 用来表示计算属性是否要更新
+    this.dirty = this.lazy
+
     this.cb = cb
     this.opts = opts
     this.deps = []
     this.depsId = new Set()
     this.id = id++
-
+    // watch 时候用到
     this.immediate = opts.immediate
     // get 第一次调用的时候是老值,第二次是新值
     // 创建 watcher 的时候，先将表达式对应的值取出来（老值）
-    this.value = this.get() // 默认会创建一个 Watcher ，调用此方法
+    this.value = this.lazy ? undefined : this.get() // 默认会创建一个 Watcher ，调用此方法
     if (this.immediate) {
       this.cb(this.value)
     }
   }
   get() {
     pushTarget(this) // 渲染 watcher
-    let value = this.getter() // 执行传入的函数
+    let value = this.getter.call(this.vm) // 执行传入的函数
     popTarget()
     return value
   }
@@ -57,8 +65,18 @@ class Watcher {
       dep.addSub(this)
     }
   }
+  depend() {
+    let i = this.deps.length
+    while (i--) {
+      this.deps[i].depend()
+    }
+  }
   update() {
-    queueWatcher(this) //
+    if (this.lazy) {
+      this.dirty = true
+    } else {
+      queueWatcher(this) //
+    }
   }
   run() {
     // 拿到get 执行后的新值
@@ -69,6 +87,11 @@ class Watcher {
       this.cb(value, this.value)
     }
     return value
+  }
+  // 计算属性调用时候执行
+  evaluate() {
+    this.value = this.get()
+    this.dirty = false
   }
 }
 

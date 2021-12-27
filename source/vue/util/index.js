@@ -2,7 +2,7 @@ const defaultRE = /\{\{((?:.|\r?\n)+?)\}\}/g
 
 export const util = {
   getValue(vm, expr) {
-    let keys = expr.split(".")
+    let keys = expr.trim().split(".")
     return keys.reduce((memo, current) => {
       memo = memo[current]
       return memo

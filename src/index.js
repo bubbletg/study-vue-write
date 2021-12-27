@@ -10,21 +10,27 @@ let vm = new Vue({
         name: "bubbletg",
         age: 10
       },
-      arr: [{ a: 1 }, 1, 2, 3]
+      arr: [{ a: 1 }, 1, 2, 3],
+      firstName: "firstName",
+      lastName: "lastName"
     }
   },
-  computed: {},
-  watch: {
-    abc: {
-      immediate: true,
-      handler(newValue, oldVaule) {
-        console.log("~~~~~~~~~~~~~watch执行了", newValue, oldVaule)
-      }
-    },
-    msg(newValue, oldVaule) {
-      console.log("~~~~~~~~~~~~~watch执行了", newValue, oldVaule)
+  computed: {
+    fullName() {
+      return this.firstName + this.lastName
     }
-  }
+  },
+  // watch: {
+  //   abc: {
+  //     immediate: true,
+  //     handler(newValue, oldVaule) {
+  //       console.log("~~~~~~~~~~~~~watch执行了", newValue, oldVaule)
+  //     }
+  //   },
+  //   msg(newValue, oldVaule) {
+  //     console.log("~~~~~~~~~~~~~watch执行了", newValue, oldVaule)
+  //   }
+  // }
 })
 
 setTimeout(() => {
@@ -33,4 +39,5 @@ setTimeout(() => {
   vm.msg = "3"
   vm.msg = "9"
   vm.abc = 1
-}, 1000)
+  vm.firstName= 'tiangui田贵'
+}, 2000)
