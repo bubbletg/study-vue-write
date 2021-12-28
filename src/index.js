@@ -39,11 +39,11 @@ console.log(oldVnode)
 let newVnode = h(
   "div",
   { id: "bbb" },
-  h("li", { style: { backgroundColor: "red" }, key: "f" }, "f"),
-  h("li", { style: { backgroundColor: "yellow" }, key: "a" }, "a"),
-  h("li", { style: { backgroundColor: "yellow" }, key: "b" }, "b"),
-  h("li", { style: { backgroundColor: "blue" }, key: "d" }, "d"),
   h("li", { style: { backgroundColor: "pink" }, key: "e" }, "e"),
+  h("li", { style: { backgroundColor: "yellow" }, key: "a" }, "a"),
+  h("li", { style: { backgroundColor: "blue" }, key: "f" }, "f"),
+  h("li", { style: { backgroundColor: "yellow" }, key: "c" }, "c"),
+  h("li", { style: { backgroundColor: "blue" }, key: "n" }, "n"),
 )
 
 setTimeout(() => {

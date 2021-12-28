@@ -61,7 +61,6 @@ function updateProperties(vnode, oldProps = {}) {
  * @param {*} newVnode
  */
 export function patch(oldVnode, newVnode) {
-  console.log(oldVnode, newVnode)
   // 1. 先比对标签
   if (oldVnode.tag !== newVnode.tag) {
     // 替换
@@ -115,9 +114,22 @@ function updateChildren(parent, oldChildren, newChildren) {
   let newEndindex = newChildren.length - 1
   let newEndVnode = newChildren[newEndindex]
 
+  function makeIndexByKey(children) {
+    let map = {}
+    children.forEach((item, index) => {
+      map[item.key] = index
+    })
+    return map
+  }
+  let map = makeIndexByKey(oldChildren)
   while (oldStartIndex <= oldEndindex && newStartIndex <= newEndindex) {
+    if (!oldStartVnode) {
+      oldStartVnode = oldChildren[++oldStartIndex]
+    } else if (!oldEndVnode) {
+      oldEndVnode = oldChildren[--oldEndindex]
+    }
     // 头插 和 尾插
-    if (isSameNode(oldStartVnode, newStartVnode)) {
+    else if (isSameNode(oldStartVnode, newStartVnode)) {
       // 新老节点头部相同，移动头指针
       // 也就是尾部插入
       patch(oldStartVnode, newStartVnode)
@@ -132,19 +144,41 @@ function updateChildren(parent, oldChildren, newChildren) {
     }
     // 下面是倒序和正序
     else if (isSameNode(oldStartVnode, newEndVnode)) {
-      console.log('·11111111111111111111');
-      // 交叉比较
+      // 交叉比较 倒序
       patch(oldStartVnode, newEndVnode)
       parent.insertBefore(oldStartVnode.el, oldEndVnode.el.nextSibling)
       oldStartVnode = oldChildren[++oldStartIndex]
       newEndVnode = newChildren[--newEndindex]
     } else if (isSameNode(oldEndVnode, newStartVnode)) {
-      console.log("22222222222222222222222")
-      // 交叉比较
+      // 交叉比较 正序
       patch(oldEndVnode, newStartVnode)
       parent.insertBefore(oldEndVnode.el, oldStartVnode.el)
-      newStartVnode = newChildren[++newStartIndex]
       oldEndVnode = oldChildren[--oldEndindex]
+      newStartVnode = newChildren[++newStartIndex]
+    } else {
+      // 乱序
+      // 先拿新节点的第一项去 老节点中匹配，如果匹配不到直接讲这个新节点插入到老节点开头前面
+      // 如果查找到则移动到老节点
+      // 最后老节点中有剩余，则直接删除老节点中剩余的属性
+      // ---------------------------------
+
+      // 拿到新节点的索引，map 是老节点列表转换的map,对应 key-index
+      let moveIndex = map[newStartVnode.key]
+      // 当新节点没有在老节点中存在时
+      if (moveIndex == null) {
+        // 直接吧新节点插入到老节点开头
+        parent.insertBefore(createElm(newStartVnode), oldStartVnode.el)
+      } else {
+        // 移动的节点
+        let moveVnode = oldChildren[moveIndex]
+        patch(moveVnode, newStartVnode)
+        // 移动节点
+        parent.insertBefore(moveVnode.el, oldStartVnode.el)
+        //
+        oldChildren[moveIndex] = undefined
+      }
+      // 新节点往后移
+      newStartVnode = newChildren[++newStartIndex]
     }
   }
 
@@ -160,4 +194,16 @@ function updateChildren(parent, oldChildren, newChildren) {
       parent.insertBefore(createElm(newChildren[i]), ele)
     }
   }
+
+  if (oldStartIndex <= oldEndindex) {
+    for (let i = oldStartIndex; i <= oldEndindex; i++) {
+      let child = oldChildren[i]
+      if (child != null) {
+        parent.removeChild(child.el)
+      }
+    }
+  }
+
+
+  // 循环时候，尽量不要使用索引作为key  可能导致重新创建当前元素的所有子元素
 }
