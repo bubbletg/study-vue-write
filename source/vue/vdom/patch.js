@@ -1,6 +1,7 @@
 export function render(vnode, container) {
   let el = createElm(vnode)
   container.appendChild(el)
+  return el
 }
 
 /**
@@ -94,6 +95,7 @@ export function patch(oldVnode, newVnode) {
       el.appendChild(createElm(child))
     }
   }
+  return el
 }
 
 function isSameNode(oldVnode, newVnode) {
