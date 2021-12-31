@@ -10,7 +10,35 @@
   <script src="/dist/umd/vue.js"></script>
   <script>
     let vm = new Vue({
-      el: "#app"
+      el: "#app",
+      data() {
+        return {
+          name: "bubbletg",
+          age: 24,
+          arr: [
+            {
+              abc: "1111"
+            },
+            {
+              c: "456"
+            }
+          ],
+          address: {
+            number: 12,
+            name: "lalaldkfjlaskdj拉到六块腹肌啊了"
+          }
+        }
+      },
+      computed: {},
+      watch: {}
     })
+    console.log(vm._data.name)
+      vm._data.arr.push({d:123})
+    setTimeout(() => {
+      vm._data.name = {
+        a: 1
+      }
+      console.log(vm._data.arr)
+    }, 3000)
   </script>
 </html>
