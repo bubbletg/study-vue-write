@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build:dev": "rollup -c",
-    "serve": "cross-env ENV=development rollup -c"
+    "serve": "cross-env ENV=development rollup -c --watch"
   },
   "repository": "git@github.com:bubbletg/study-vue-write.git",
   "author": "BubbleTg <tg_z@qq.com>",
@@ -15,6 +15,7 @@
     "cross-env": "^7.0.3",
     "rollup": "^2.62.0",
     "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-livereload": "^2.0.5",
     "rollup-plugin-serve": "^1.1.0"
   }
 }
