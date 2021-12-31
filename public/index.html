@@ -32,13 +32,13 @@
       computed: {},
       watch: {}
     })
-    console.log(vm._data.name)
-      vm._data.arr.push({d:123})
+    console.log(vm.name)
+    vm.arr.push({ d: 123 })
     setTimeout(() => {
-      vm._data.name = {
+      vm.name = {
         a: 1
       }
-      console.log(vm._data.arr)
+      console.log(vm.arr)
     }, 3000)
   </script>
 </html>

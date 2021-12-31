@@ -1,10 +1,11 @@
+import { set } from "lodash"
 import { isObject, def } from "../util/index"
 import { arrayMethods } from "./array.js"
 class Observer {
   constructor(value) {
     // 用于在 array.js 用可以拿到 Observer 的 observerArray 方法
     def(value, "__ob__", this)
-    
+
     if (Array.isArray(value)) {
       // 观测数组，不会对数组的索引进行观测，会导致性能问题
 
@@ -59,9 +60,32 @@ function defineReactive(data, key, value) {
   })
 }
 
+/**
+ *  通过创建 Observer 实现对数据的观测
+ * @param {*} data  要观测的数据
+ * @returns 
+ */
 export function observe(data) {
   if (!isObject(data)) {
     return
   }
   return new Observer(data)
+}
+
+/**
+ *  代理，实现 vm[key]取到 vm[source][key] 的值
+ * 
+ * @param {*} vm 
+ * @param {*} source 
+ * @param {*} key 
+ */
+export function proxy(vm, source, key) {
+  Object.defineProperty(vm, key, {
+    get() {
+      return vm[source][key]
+    },
+    set(newValue) {
+      vm[source][key] = newValue
+    }
+  })
 }
