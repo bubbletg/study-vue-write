@@ -1,4 +1,4 @@
-import { set } from "lodash"
+
 import { isObject, def } from "../util/index"
 import { arrayMethods } from "./array.js"
 class Observer {
