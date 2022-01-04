@@ -1,4 +1,6 @@
 import { initMixin } from "./init"
+import { renderMixin } from "./render"
+import {lifecycleMixin } from "./lifecycle"
 
 
 function Vue(options) {
@@ -10,5 +12,9 @@ function Vue(options) {
  * 主要功能就是给 Vue 原型上添加 _init 方法
  */
 initMixin(Vue)
+
+renderMixin(Vue)
+
+lifecycleMixin(Vue)
 
 export default Vue

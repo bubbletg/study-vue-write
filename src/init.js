@@ -1,5 +1,7 @@
 import { initState } from "./state"
 import { compileToFunction }  from './compiler/index'
+import { mountComponent } from './lifecycle'
+
 
 export function initMixin(Vue) {
   /**
@@ -20,6 +22,11 @@ export function initMixin(Vue) {
     }
   }
 
+  /**
+   * 挂载 
+   * 主要流程：1.将 template 转换成 ast 语法树-> 生成 reender  方法 -> 生成虚拟dom -> 真实的DOM
+   * @param {*} el 
+   */
   Vue.prototype.$mount = function (el) {
     const vm = this
     const options = vm.$options
@@ -33,9 +40,32 @@ export function initMixin(Vue) {
       }
       // 将 template 转换为 render 函数
       const render = compileToFunction(template)
-      console.log("🚀 ~ file: init.js ~ line 36 ~ initMixin ~ render", render)
-      
+
+      /**
+     * render 函数，
+     * 
+      <div id="app">
+      <div id="aaaa" class="abc-abc" style="background:red;color:blick;">
+        hello,你好
+        <div style="background:red;color:blick;">age:{{ age
+        }},  name: {{ name}}     ,你好</div>
+        <span>age:{{ age}}</span>
+      </div>
+    </div>
+    ----------------------转换为下面👇render 函数-------------------
+      (function anonymous(
+      ) {
+          with(this){return _c("div",{id:"aaaa",class:"abc-abc",style:{"background":"red","color":"blick"}},_v("hello,你好"),_c("div",{style:{"background":"red","color":"blick"}},_v("age:"+_s(age)+",name:"+_s(name)+",你好"))
+        ,_c("span",undefined,_v("age:"+_s(age)))
+        )
+        }
+      })
+     */
+
       options.render = render
     }
+
+    // 渲染当前组件，挂载这个组件 
+    mountComponent(vm,el)
   }
 }
