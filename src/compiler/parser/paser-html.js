@@ -21,68 +21,74 @@ const conditionalComment = /^<!\[/
 
 const regexEscapeRE = /[-.*+?^${}()|[\]\/\\]/g
 
-let root = null // ast 语法树
-let currentParent // 标识当前 父亲是谁
-let stack = [] // 标签栈
-const ELEMENT_TYPE = 1
-const TEXT_TYPE = 3
 
-function createASTElement(tagName, attrs) {
-  return {
-    tag: tagName,
-    type: ELEMENT_TYPE,
-    attrs: attrs,
-    parent: null,
-    children: []
-  }
-}
 
 /**
- * 开始标签 处理
- * @param {*} tagName
- * @param {*} attrs
+ * 解析模版，返回ast 语法树
+ * @param {*} html 
+ * @returns 
  */
-function start(tagName, attrs) {
-  // 遇到开始标签，创建一个 ast 元素
-  let element = createASTElement(tagName, attrs)
-  if (!root) {
-    root = element
-  }
-  currentParent = element // 标记当前标签
-  stack.push(element)
-}
+export function parserHTML(html) {
+  let root = null // ast 语法树
+  let currentParent // 标识当前 父亲是谁
+  let stack = [] // 标签栈
+  const ELEMENT_TYPE = 1
+  const TEXT_TYPE = 3
 
-/**
- * 文本标签处理
- * @param {*} text
- */
-function chars(text) {
-  text = text.replace(/\s/g, "")
-  if (text) {
-    currentParent.children.push({
-      text,
-      type: TEXT_TYPE,
-    })
-  }
-}
-
-/**
- * 结尾标签处理
- * @param {*} tagName 
- */
-function end(tagName) {
-  let element = stack.pop()
-  if (tagName === element.tag) {
-    currentParent = stack[stack.length - 1]
-    if (currentParent) {
-      element.parent = currentParent
-      currentParent.children.push(element)
+  function createASTElement(tagName, attrs) {
+    return {
+      tag: tagName,
+      type: ELEMENT_TYPE,
+      attrs: attrs,
+      parent: null,
+      children: []
     }
   }
-}
 
-export function parserHTML(html) {
-  html = html.trim()
+  /**
+   * 开始标签 处理
+   * @param {*} tagName
+   * @param {*} attrs
+   */
+  function start(tagName, attrs) {
+    // 遇到开始标签，创建一个 ast 元素
+    let element = createASTElement(tagName, attrs)
+    if (!root) {
+      root = element
+    }
+    currentParent = element // 标记当前标签
+    stack.push(element)
+  }
+
+  /**
+   * 文本标签处理
+   * @param {*} text
+   */
+  function chars(text) {
+    text = text.replace(/\s/g, "")
+    if (text) {
+      currentParent.children.push({
+        text,
+        type: TEXT_TYPE
+      })
+    }
+  }
+
+  /**
+   * 结尾标签处理
+   * @param {*} tagName
+   */
+  function end(tagName) {
+    let element = stack.pop()
+    if (tagName === element.tag) {
+      currentParent = stack[stack.length - 1]
+      if (currentParent) {
+        element.parent = currentParent
+        currentParent.children.push(element)
+      }
+    }
+  }
+
   while (html) {
     let textEnd = html.indexOf("<")
     if (textEnd === 0) {
@@ -107,6 +113,8 @@ export function parserHTML(html) {
     if (textEnd >= 0) {
       // 拿到 文本
       text = html.substring(0, textEnd)
+    } else {
+      text = html
     }
     if (text) {
       advance(text.length)

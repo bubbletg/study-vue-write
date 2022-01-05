@@ -33,7 +33,28 @@ export function renderMixin(Vue) {
   Vue.prototype._render = function () {
     const vm = this
     const { render } = vm.$options
+    console.log("🚀 ~ file: render.js ~ line 36 ~ renderMixin ~ render", render)
     let vonde = render.call(vm)
     return vonde
   }
 }
+
+// ;(function anonymous() {
+//   with (this) {
+//     return _c(
+//       "div",
+//       {
+//         id: "aaaa",
+//         class: "abc-abc",
+//         style: { background: "red", color: "blick" }
+//       },
+//       _v("hello,你好"),
+//       _c(
+//         "div",
+//         { style: { background: "red", color: "blick" } },
+//         _v("age:" + _s(age) + ",name:" + _s(name) + ",你好")
+//       ),
+//       _c("span", undefined, _v("age:" + _s(age)))
+//     )
+//   }
+// })
