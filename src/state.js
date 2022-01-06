@@ -1,5 +1,16 @@
 import { observe } from "./observer/index"
 import { proxy } from "./util/index"
+import Watcher from "./observer/watcher"
+
+export function stateMixin(Vue) {
+  Vue.prototype.$watch = function (key, handler, options = {}) {
+    options.user = true // 说明当前watcher 是一个用户watcher
+    let watcher = new Watcher(this, key, handler, options)
+    if (options.immediate) {
+      handler(watcher.value)
+    }
+  }
+}
 
 export function initState(vm) {
   const opts = vm.$options
@@ -16,7 +27,7 @@ export function initState(vm) {
     initComputed(vm)
   }
   if (opts.watch) {
-    initWatch(vm)
+    initWatch(vm, opts.watch)
   }
 }
 
@@ -45,4 +56,19 @@ function initData(vm) {
 
 function initComputed(vm) {}
 
-function initWatch(vm) {}
+function initWatch(vm, watch) {
+  for (let key in watch) {
+    let handler = watch[key]
+    if (Array.isArray(handler)) {
+      for (let i = 0; i < handler.length; i++) {
+        createWatch(vm, key, handler[i])
+      }
+    } else {
+      createWatch(vm, key, handler)
+    }
+  }
+}
+
+function createWatch(vm, key, handler) {
+  return vm.$watch(key, handler)
+}

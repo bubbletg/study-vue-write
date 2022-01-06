@@ -9,9 +9,7 @@
   <body>
     <div id="app">
       <div id="aaaa" class="abc-abc" style="background: red; color: blick">
-        <div>
-          {{arr}}
-        </div>
+        <div>{{arr}}---{{address.n}}---{{name}}</div>
       </div>
     </div>
   </body>
@@ -23,7 +21,9 @@
         return {
           name: "bubbletg",
           age: 24,
-          arr: [[1,2,3],[1,2,3]
+          arr: [
+            [1, 2, 3],
+            [1, 2, 3]
             // {
             //   abc: "1111"
             // },
@@ -32,27 +32,38 @@
             // }
           ],
           address: {
+            n: "1",
             number: 12,
             name: "lalaldkfjlaskdj拉到六块腹肌啊了"
           }
         }
       },
       computed: {},
-      watch: {},
+      watch: {
+        name: [
+          function (newVal, oldVal) {
+            console.log(
+              "🚀 ~ file: index.html ~ line 44 ~ newVal",
+              newVal,
+              oldVal
+            )
+          },
+          function (newVal, oldVal) {
+            console.log(
+              "🚀 ~ file: index.html ~ line 48 ~ newVal",
+              newVal,
+              oldVal
+            )
+          }
+        ],
+        "address.n": function () {
+          console.log("🚀 ~ file: index.html ~ line 47 ~ function")
+        }
+      }
     })
-      vm.arr.push([112121,1111])
-      vm.arr.push(1)
-      vm.arr.push(2)
-      vm.arr.push(3)
-      vm.arr.push(4)
-      // vm.age = 100
-      // vm.name = {
-      //   a: 1
-      // }
-      // console.log(vm.arr)
-      vm.$nextTick(()=>{
-        console.log(vm.$el.innerHTML);
-      })
-
+    setTimeout(() => {
+      vm.name = "bubbletg ------biubiu"
+      vm.address.n = "ainianianadsfald;s"
+    }, 1000)
   </script>
 </html>
