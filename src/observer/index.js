@@ -1,6 +1,7 @@
 
 import { isObject, def } from "../util/index"
 import { arrayMethods } from "./array.js"
+import Dep from './dep'
 class Observer {
   constructor(value) {
     // 用于在 array.js 用可以拿到 Observer 的 observerArray 方法
@@ -45,6 +46,7 @@ class Observer {
 }
 
 function defineReactive(data, key, value) {
+  let dep = new Dep()
   // 递归劫持对象，实现深度劫持
   observe(value)
   Object.defineProperty(data, key, {
@@ -55,8 +57,16 @@ function defineReactive(data, key, value) {
       // 对用户设置的数据进行劫持
       observe(newValue)
       value = newValue
+
+      dep.notify() // 通知依赖watcher更新
     },
     get() {
+    console.log("🚀 ~ file: index.js ~ line 64 ~ get ~ get")
+      // 取值的时候，对每个属性都对应着自己的watchder
+      if (Dep.target) {
+        // 当前属性有watcher
+        dep.depend() // 将 watcher 存起来
+      }
       return value
     }
   })
