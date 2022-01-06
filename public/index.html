@@ -8,14 +8,13 @@
   </head>
   <body>
     <div id="app">
-      <div id="aaaa" class="abc-abc" style="background:red;color:blick;">
+      <div id="aaaa" class="abc-abc" style="background: red; color: blick">
         hello,你好
-        <div style="background:red;color:blick;">age:{{ age
-        }},  name: {{ name}}     ,你好</div>
-        <span>age:{{ age}}</span>
-        <div>
-          address.name: {{address.name}}
+        <div style="background: red; color: blick">
+          age:{{ age }}, name: {{ name}} ,你好
         </div>
+        <span>age:{{ age}}</span>
+        <div>address.name: {{address.name}}</div>
       </div>
     </div>
   </body>
@@ -42,7 +41,24 @@
         }
       },
       computed: {},
-      watch: {}
+      watch: {},
+      beforeCreate() {
+        debugger
+        console.log(
+          "🚀 ~ file: index.html ~ line 47 ~ beforeCreate ~ beforeCreate"
+        )
+      },
+      created() {
+        console.log("🚀 ~ file: index.html ~ line 47 ~ created ~ created")
+      },
+      beforeMount() {
+        console.log(
+          "🚀 ~ file: index.html ~ line 47 ~ beforeMount ~ beforeMount"
+        )
+      },
+      mounted() {
+        console.log("🚀 ~ file: index.html ~ line 47 ~ mounted ~ mounted")
+      }
     })
     console.log(vm.name)
     vm.arr.push({ d: 123 })
