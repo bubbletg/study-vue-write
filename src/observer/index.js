@@ -48,6 +48,8 @@ function defineReactive(data, key, value) {
   // 递归劫持对象，实现深度劫持
   observe(value)
   Object.defineProperty(data, key, {
+    configurable: true,
+    enumerable: true,
     set(newValue) {
       if (newValue == value) return
       // 对用户设置的数据进行劫持

@@ -1,7 +1,7 @@
 import { initState } from "./state"
-import { compileToFunction }  from './compiler/index'
-import { mountComponent } from './lifecycle'
-
+import { compileToFunction } from "./compiler/index"
+import { mountComponent, callHook } from "./lifecycle"
+import { mergeOptions } from "./util/index"
 
 export function initMixin(Vue) {
   /**
@@ -11,21 +11,23 @@ export function initMixin(Vue) {
   Vue.prototype._init = function (options) {
     const vm = this
     // vue 中使用 this.$options 指代用户传递的属性
-    vm.$options = options
+    // vm.constructor.options 也相当 Vue.options ,使用vm.constructor 是因为 可能存在子类继承父类，vm.constructor 这个时候表示子类
+    vm.$options = mergeOptions(vm.constructor.options, options)
 
+    callHook(vm, "beforeCreate")
     // 初始化状态
     initState(vm)
-
+    callHook(vm, "created")
     // 如果用户传入了 el 属性，将页面渲染出来
-    if (vm.$options.el) {   
+    if (vm.$options.el) {
       vm.$mount(vm.$options.el)
     }
   }
 
   /**
-   * 挂载 
+   * 挂载
    * 主要流程：1.将 template 转换成 ast 语法树-> 生成 reender  方法 -> 生成虚拟dom -> 真实的DOM
-   * @param {*} el 
+   * @param {*} el
    */
   Vue.prototype.$mount = function (el) {
     const vm = this
@@ -65,7 +67,7 @@ export function initMixin(Vue) {
       options.render = render
     }
 
-    // 渲染当前组件，挂载这个组件 
-    mountComponent(vm,el)
+    // 渲染当前组件，挂载这个组件
+    mountComponent(vm, el)
   }
 }

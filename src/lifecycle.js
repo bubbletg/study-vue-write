@@ -22,6 +22,8 @@ export function mountComponent(vm, el) {
   const options = vm.$options
   vm.$el = el
 
+  // 调用对应勾子
+  callHook(vm, "beforeMount")
   // 渲染页面
   // 该方法无论是渲染还是更新都会调用此方法
   let updateComponent = () => {
@@ -31,4 +33,22 @@ export function mountComponent(vm, el) {
 
   // 渲染 watcher , 每一个组件都有一个watcher
   new Watcher(vm, updateComponent, () => {}, true) // true 标识这是一个渲染Watcher
+  // 调用对应勾子
+  callHook(vm, "mounted")
+}
+
+
+/**
+ * 执行对应勾子
+ * @param {*} vm 
+ * @param {*} hook 
+ */
+export function callHook(vm, hook) {
+  const handlers = vm.$options[hook]
+  if (handlers) {
+    // 依次执行对应的勾子
+    for (let i = 0; i < handlers.length; i++) {
+      handlers[i].call(vm)
+    }
+  }
 }
