@@ -1,9 +1,10 @@
-
 import { isObject, def } from "../util/index"
 import { arrayMethods } from "./array.js"
-import Dep from './dep'
+import Dep from "./dep"
 class Observer {
   constructor(value) {
+    this.dep = new Dep() // 给数组使用
+
     // 用于在 array.js 用可以拿到 Observer 的 observerArray 方法
     def(value, "__ob__", this)
 
@@ -46,9 +47,10 @@ class Observer {
 }
 
 function defineReactive(data, key, value) {
-  let dep = new Dep()
+  let dep = new Dep() // 该 dep 只给对象使用
   // 递归劫持对象，实现深度劫持
-  observe(value)
+  // 这里的 value 可能是对象，也可能是数组，返回的结果是 Observer 实例，也就是当前对应value的observer
+  let childOb = observe(value)
   Object.defineProperty(data, key, {
     configurable: true,
     enumerable: true,
@@ -61,11 +63,19 @@ function defineReactive(data, key, value) {
       dep.notify() // 通知依赖watcher更新
     },
     get() {
-    console.log("🚀 ~ file: index.js ~ line 64 ~ get ~ get")
       // 取值的时候，对每个属性都对应着自己的watchder
       if (Dep.target) {
         // 当前属性有watcher
         dep.depend() // 将 watcher 存起来
+        if (childOb) {
+          // 收集数组的相关依赖
+          childOb.dep.depend()
+
+          if (Array.isArray(value)) {
+            // 当数组中还是数组时候
+            dependArray(value)
+          }
+        }
       }
       return value
     }
@@ -73,9 +83,23 @@ function defineReactive(data, key, value) {
 }
 
 /**
+ * 数组中的数组依赖收集
+ * @param {*} value
+ */
+function dependArray(value) {
+  for (let i = 0; i < value.length; i++) {
+    let current = value[i]
+    current.__ob__ && current.__ob__.dep.depend()
+    if (Array.isArray(current)) {
+      dependArray(current) // 递归收集
+    }
+  }
+}
+
+/**
  *  通过创建 Observer 实现对数据的观测
  * @param {*} data  要观测的数据
- * @returns 
+ * @returns
  */
 export function observe(data) {
   if (!isObject(data)) {
@@ -83,4 +107,3 @@ export function observe(data) {
   }
   return new Observer(data)
 }
-
