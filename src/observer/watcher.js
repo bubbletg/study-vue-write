@@ -1,4 +1,5 @@
 import { pushTarget, popTarget } from "./dep"
+import { queueWatcher } from './schedular'
 
 export default class Watcher {
   constructor(vm, exprOrFn, callback, options) {
@@ -9,7 +10,7 @@ export default class Watcher {
 
     this.depsId = new Set() // 保存Dep 的id
     this.deps = [] // 保存 dep
-    this.getter = exprOrFn  // 
+    this.getter = exprOrFn //
     this.get()
   }
   get() {
@@ -18,11 +19,14 @@ export default class Watcher {
     popTarget()
   }
   update() {
+    queueWatcher(this)
+  }
+  run() {
     this.get()
   }
   /**
    * 当前watcher 添加一个 dep ,同时这个 dep 也添加上 这个watcher
-   * @param {*} dep 
+   * @param {*} dep
    */
   addDep(dep) {
     // watcher 里不能放重复的dep,Dep 不能放重复的watcher
@@ -35,3 +39,4 @@ export default class Watcher {
     }
   }
 }
+

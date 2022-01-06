@@ -2,6 +2,7 @@ import { initState } from "./state"
 import { compileToFunction } from "./compiler/index"
 import { mountComponent, callHook } from "./lifecycle"
 import { mergeOptions } from "./util/index"
+import { nextTick } from "./util/next-tick"
 
 export function initMixin(Vue) {
   /**
@@ -70,4 +71,6 @@ export function initMixin(Vue) {
     // 渲染当前组件，挂载这个组件
     mountComponent(vm, el)
   }
+
+  Vue.prototype.$nextTick = nextTick
 }

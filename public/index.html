@@ -40,13 +40,19 @@
       computed: {},
       watch: {},
     })
-    setTimeout(() => {
-      vm.arr[0].push([112121,1111])
+      vm.arr.push([112121,1111])
+      vm.arr.push(1)
+      vm.arr.push(2)
+      vm.arr.push(3)
+      vm.arr.push(4)
       // vm.age = 100
       // vm.name = {
       //   a: 1
       // }
       // console.log(vm.arr)
-    }, 3000)
+      vm.$nextTick(()=>{
+        console.log(vm.$el.innerHTML);
+      })
+
   </script>
 </html>

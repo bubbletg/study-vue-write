@@ -29,6 +29,8 @@ export function mountComponent(vm, el) {
   let updateComponent = () => {
     // vm._render() 返回的虚拟DOM
     vm._update(vm._render())
+    console.log("🚀 ~ file: lifecycle.js ~ line 32 ~ updateComponent ~ _update")
+    
   }
 
   // 渲染 watcher , 每一个组件都有一个watcher
