@@ -42,27 +42,11 @@
       },
       computed: {},
       watch: {},
-      beforeCreate() {
-        debugger
-        console.log(
-          "🚀 ~ file: index.html ~ line 47 ~ beforeCreate ~ beforeCreate"
-        )
-      },
-      created() {
-        console.log("🚀 ~ file: index.html ~ line 47 ~ created ~ created")
-      },
-      beforeMount() {
-        console.log(
-          "🚀 ~ file: index.html ~ line 47 ~ beforeMount ~ beforeMount"
-        )
-      },
-      mounted() {
-        console.log("🚀 ~ file: index.html ~ line 47 ~ mounted ~ mounted")
-      }
     })
     console.log(vm.name)
     vm.arr.push({ d: 123 })
     setTimeout(() => {
+      vm.age = 100
       vm.name = {
         a: 1
       }
