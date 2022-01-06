@@ -13,8 +13,9 @@ export default class Dep {
    * 这里就是 给当前属性的watcehr 添加一个Dep,添加上的这个Dep也会添加上这个watcher
    */
   depend() {
-    Dep.target.addDep(this)
-    // this.subs.push(Dep.target)
+    if (Dep.target) {
+      Dep.target.addDep(this)
+    }
   }
   /**
    * 派发更新
@@ -27,6 +28,7 @@ export default class Dep {
   }
 }
 
+Dep.target = null
 let stack = []
 
 /**
