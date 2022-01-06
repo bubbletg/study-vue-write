@@ -27,6 +27,8 @@ methods.forEach(method => {
     if (inserted) {
       ob.observerArray(inserted)
     }
+    // 派发更新
+    ob.dep.notify()
     return result
   }
-})
+}) 
