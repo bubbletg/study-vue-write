@@ -9,7 +9,7 @@
   <body>
     <div id="app">
       <div id="aaaa" class="abc-abc" style="background: red; color: blick">
-        <div>{{arr}}---{{address.n}}---{{name}}</div>
+        <div>nametoname:    {{nametoname}}</div>
       </div>
     </div>
   </body>
@@ -38,32 +38,52 @@
           }
         }
       },
-      computed: {},
-      watch: {
-        name: [
-          function (newVal, oldVal) {
-            console.log(
-              "🚀 ~ file: index.html ~ line 44 ~ newVal",
-              newVal,
-              oldVal
-            )
+      computed: {
+        // nameAge(){
+        //   console.log('nameAge')
+        //   return this.name + this.age
+        // },
+        nametoname:{
+          get(){
+            return this.name + this.name + this.age
           },
-          function (newVal, oldVal) {
-            console.log(
-              "🚀 ~ file: index.html ~ line 48 ~ newVal",
-              newVal,
-              oldVal
-            )
+          set(newVal){
+          console.log("🚀 ~ file: index.html ~ line 52 ~ set ~ newVal", newVal)
           }
-        ],
-        "address.n": function () {
-          console.log("🚀 ~ file: index.html ~ line 47 ~ function")
         }
-      }
+      },
+      // watch: {
+      //   name: [
+      //     function (newVal, oldVal) {
+      //       console.log(
+      //         "🚀 ~ file: index.html ~ line 44 ~ newVal",
+      //         newVal,
+      //         oldVal
+      //       )
+      //     },
+      //     function (newVal, oldVal) {
+      //       console.log(
+      //         "🚀 ~ file: index.html ~ line 48 ~ newVal",
+      //         newVal,
+      //         oldVal
+      //       )
+      //     }
+      //   ],
+      //   "address.n": function () {
+      //     console.log("🚀 ~ file: index.html ~ line 47 ~ function")
+      //   }
+      // }
     })
+    vm.nameAge
+    vm.nameAge
+    vm.nameAge
     setTimeout(() => {
       vm.name = "bubbletg ------biubiu"
-      vm.address.n = "ainianianadsfald;s"
+      vm.name ='1'
+      vm.name ='2'
+      vm.name ='3'
+      vm.name ='4'
+      // vm.address.n = "ainianianadsfald;s"
     }, 1000)
   </script>
 </html>
