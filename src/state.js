@@ -1,7 +1,7 @@
 import { observe } from "./observer/index"
 import { proxy } from "./util/index"
 import Watcher from "./observer/watcher"
-
+import Dep from './observer/dep'
 export function stateMixin(Vue) {
   Vue.prototype.$watch = function (key, handler, options = {}) {
     options.user = true // 说明当前watcher 是一个用户watcher
@@ -24,7 +24,7 @@ export function initState(vm) {
     initData(vm)
   }
   if (opts.computed) {
-    initComputed(vm)
+    initComputed(vm, opts.computed)
   }
   if (opts.watch) {
     initWatch(vm, opts.watch)
@@ -54,7 +54,47 @@ function initData(vm) {
   observe(data)
 }
 
-function initComputed(vm) {}
+function initComputed(vm, computed) {
+  const watchers =vm._computedWatchers = {}
+  for (let key in computed) {
+    const userDef = computed[key]
+    //计算属性： 依赖的属性变化就重新取值
+    let getter = typeof userDef === "function" ? userDef : userDef.get
+    // 每个计算属性本质就是 watcher
+    watchers[key] = new Watcher(vm, getter, () => {}, { lazy: true }) // lazy: true 标记默认不执行
+    // 把 computed 的key 定义（代理）在vm上
+    defineComputed(vm, key, userDef)
+  }
+}
+
+function defineComputed(vm, key, userDef) {
+  let sharedProperty = {}
+  if (typeof userDef === "function") {
+    sharedProperty.get = createComputedGetter(key)
+  } else {
+    sharedProperty.get = createComputedGetter(key)
+    sharedProperty.set = userDef.set
+  }
+  Object.defineProperty(vm, key, sharedProperty)
+}
+
+function createComputedGetter(key) {
+  return function computedGetter() {
+    // _computedWatchers 包含所有的计算属性
+    // 通过 key 拿到对应的watcher, 这个 watcher 包含了 getter
+    let watcher = this._computedWatchers[key]
+    // 根据 dirty 来判断是否重新求值
+    if (watcher.dirty) {
+      watcher.evaluate()
+    }
+
+    if (Dep.target) {
+      // 当 计算属性取完值后，Dep.target 还是有值，需要继续向上收集
+      watcher.depend() // 计算属性依赖收集
+    }
+    return watcher.value
+  }
+}
 
 function initWatch(vm, watch) {
   for (let key in watch) {

@@ -10,7 +10,13 @@ export default class Watcher {
     this.options = options
     this.id = id++
 
+    // 标记用户watcher
     this.user = !!options.user
+
+    // 计算属性，标记为true
+    this.lazy = !!options.lazy
+    // 判断是否脏数据， 用于计算属性缓存
+    this.dirty = options.lazy
 
     this.depsId = new Set() // 保存Dep 的id
     this.deps = [] // 保存 dep
@@ -29,22 +35,29 @@ export default class Watcher {
     } else {
       this.getter = exprOrFn //渲染watcher 传过来 exprOrFn 是一个方法
     }
-    this.value = this.get()
+
+    // this.lazy 计算属性时候，new Watcher 的lazy为true ，第一次不执行
+    this.value = this.lazy ? undefined : this.get()
   }
   get() {
     pushTarget(this) // 把当前watcher 存起来
-    const vlaue = this.getter()
+    const vlaue = this.getter.call(this.vm)
     popTarget()
     return vlaue
   }
   update() {
-    queueWatcher(this)
+    if (this.lazy) {
+      this.dirty = true
+    } else {
+      queueWatcher(this)
+    }
   }
   run() {
     let newValue = this.get()
     let oldVnode = this.value
     this.value = newValue // 为了保证下一次的更新时，上一次的最新值是下一次的老值
-    if (this.user) { // 使用户watcher 执行回调
+    if (this.user) {
+      // 使用户watcher 执行回调
       this.callback(newValue, oldVnode)
     }
   }
@@ -60,6 +73,28 @@ export default class Watcher {
       this.depsId.add(id)
       this.deps.push(dep)
       dep.addSub(this)
+    }
+  }
+  /**
+   * 计算属性取值使用
+   */
+  evaluate() {
+    this.dirty = false // 标识计算属性取过值了
+    this.value = this.get() // 执行计算属性的用户getter
+  }
+
+  /**
+   * 计算属性依赖收集
+   * 实际上是计算属性的依赖属性再次收集依赖
+   */
+  depend() {
+    // 这里的deps 是 计算属性依赖的属性的deps
+    let i = this.deps.length
+    while (i--) {
+      // 让计算属性里依赖的属性 收集依赖,
+      // 这里收集的是渲染watcher,
+      // 目的是 计算属性依赖的属性变化是，触发渲染watcher 更新
+      this.deps[i].depend()
     }
   }
 }
