@@ -22,6 +22,15 @@ export function def(data, key, value) {
 }
 
 /**
+ * 判断标签是否原生标签
+ * @param {*} tagName
+ */
+export function isReservedTag(tagName) {
+  const reservedTag = "a,div,span,p,img,button,ul,li,div1,div2"
+  return reservedTag.indexOf(tagName) > -1
+}
+
+/**
  *  代理，实现 vm[key]取到 vm[source][key] 的值
  *
  * @param {*} vm
@@ -53,9 +62,9 @@ const LIFECYCLE_HOOKS = [
 let strats = {}
 /**
  * 生命周期的合并策略
- * @param {*} parentVal 
- * @param {*} childVal 
- * @returns 
+ * @param {*} parentVal
+ * @param {*} childVal
+ * @returns
  */
 function mergeHooks(parentVal, childVal) {
   if (childVal) {
@@ -72,6 +81,16 @@ function mergeHooks(parentVal, childVal) {
 LIFECYCLE_HOOKS.forEach(hook => {
   strats[hook] = mergeHooks
 })
+
+strats.components = function (parentVal, childVal) {
+  let options = Object.create(parentVal)
+  if (childVal) {
+    for (let key in childVal) {
+      options[key] = childVal[key]
+    }
+  }
+  return options
+}
 
 /**
  *

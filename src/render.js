@@ -6,7 +6,7 @@ export function renderMixin(Vue) {
    * @returns
    */
   Vue.prototype._c = function () {
-    return createElement(...arguments)
+    return createElement(this,...arguments)
   }
 
   /**
@@ -15,7 +15,7 @@ export function renderMixin(Vue) {
    * @returns
    */
   Vue.prototype._v = function (text) {
-    return createTextNode(text)
+    return createTextNode(this,text)
   }
 
   /**
@@ -33,6 +33,7 @@ export function renderMixin(Vue) {
   Vue.prototype._render = function () {
     const vm = this
     const { render } = vm.$options
+    console.log("🚀 ~ file: render.js ~ line 36 ~ renderMixin ~ render", render)
     let vonde = render.call(vm)
     return vonde
   }
