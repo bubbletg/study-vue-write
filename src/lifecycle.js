@@ -8,8 +8,17 @@ export function lifecycleMixin(Vue) {
    */
   Vue.prototype._update = function (vnode) {
     const vm = this
-    // patch 用虚拟节点创建真实的节点，替换真实的$el
-    vm.$el = patch(vm.$el, vnode)
+
+    let preVnode = vm.preVnode // 保存上一次Vnode
+
+    if (!preVnode) {
+      // 初次渲染
+      vm.preVnode = vnode
+      // patch 用虚拟节点创建真实的节点，替换真实的$el
+      vm.$el = patch(vm.$el, vnode)
+    } else {
+      vm.$el = patch(preVnode, vnode)
+    }
   }
 }
 
@@ -37,11 +46,10 @@ export function mountComponent(vm, el) {
   callHook(vm, "mounted")
 }
 
-
 /**
  * 执行对应勾子
- * @param {*} vm 
- * @param {*} hook 
+ * @param {*} vm
+ * @param {*} hook
  */
 export function callHook(vm, hook) {
   const handlers = vm.$options[hook]
