@@ -1,96 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-  </head>
-  <body>
+</head>
+
+<body>
+    <!-- <my></my> -->
     <div id="app">
-      <div>
-        <div1>
-          这是敷最佳
-          <my-button></my-button>
-        </div1>
-        <div2>
-          第二第二
-          <my-button1></my-button1>
-        </div2>
-      </div>
-    </div>
-  </body>
+        <my></my>
+        <my></my> <span>我是常规p name:::::::::{{name}}</span>
+    </div> <!-- <script src="/node_modules/vue/dist/vue.js"></script> -->
+    <!-- <script src="/node_modules/vue/dist/vue.js"></script> -->
   <script src="/dist/umd/vue.js"></script>
-  <script>
-    Vue.component("my-button1", {
-      template: "<button>hello</button>"
-    })
-    let vm2 = new Vue({
-      el: "#app",
-      components: {
-        "my-button": {
-          template: "<div>这是子的吗？</div>"
-        }
-      }
-    })
-    // let vm = new Vue({
-    //   el: "#app",
-    //   data() {
-    //     return {
-    //       name: "bubbletg",
-    //       age: 24,
-    //       arr: [
-    //         [1, 2, 3],
-    //         [1, 2, 3]
-    //         // {
-    //         //   abc: "1111"
-    //         // },
-    //         // {
-    //         //   c: "456"
-    //         // }
-    //       ],
-    //       address: {
-    //         n: "1",
-    //         number: 12,
-    //         name: "lalaldkfjlaskdj拉到六块腹肌啊了"
-    //       }
-    //     }
-    //   },
-    //   computed: {
-    //     // nameAge(){
-    //     //   console.log('nameAge')
-    //     //   return this.name + this.age
-    //     // },
-    //     nametoname:{
-    //       get(){
-    //         return this.name + this.name + this.age
-    //       },
-    //       set(newVal){
-    //       console.log("🚀 ~ file: index.html ~ line 52 ~ set ~ newVal", newVal)
-    //       }
-    //     }
-    //   },
-    //   // watch: {
-    //   //   name: [
-    //   //     function (newVal, oldVal) {
-    //   //       console.log(
-    //   //         "🚀 ~ file: index.html ~ line 44 ~ newVal",
-    //   //         newVal,
-    //   //         oldVal
-    //   //       )
-    //   //     },
-    //   //     function (newVal, oldVal) {
-    //   //       console.log(
-    //   //         "🚀 ~ file: index.html ~ line 48 ~ newVal",
-    //   //         newVal,
-    //   //         oldVal
-    //   //       )
-    //   //     }
-    //   //   ],
-    //   //   "address.n": function () {
-    //   //     console.log("🚀 ~ file: index.html ~ line 47 ~ function")
-    //   //   }
-    //   // }
-    // })
-  </script>
+
+    <script>
+        Vue.component('my', {
+            template: `<div><ul>
+                <li>hello age:::{{age}}</li>
+                <li>11111</li>
+                </ul> </div>`,
+            data: () => {
+                return {
+                    age: 18
+                }
+            },
+            mounted() {
+                setTimeout(() => this.age = 25, 3000)
+            },
+            components: {
+                Cmp1: {
+                    template: `<p>我是Cmp1</p>`
+                }
+            }
+        })
+        let vm = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    name: '小明'
+                }
+            },
+        })
+
+        console.log(vm)
+    </script>
+</body>
+
 </html>
