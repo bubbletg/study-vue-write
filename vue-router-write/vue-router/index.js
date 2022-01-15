@@ -19,6 +19,8 @@ class VueRouter {
         this.history = new BrowserHistory(this)
         break
     }
+
+    this.beforeHooks = []
   }
   init(app) {
     // 这里的app 是最外层的 vue 实例
@@ -44,6 +46,9 @@ class VueRouter {
   push(location) {
     // const history = this.history
     window.location.hash = location
+  }
+  beforeEach(fn) {
+    this.beforeHooks.push(fn)
   }
 }
 

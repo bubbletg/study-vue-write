@@ -34,14 +34,36 @@ export default class History {
       return
     }
 
-    // 用最新的匹配结果，去更新试图
-    this.current = current
-    this.cb && this.cb(current)
+    const iterator = (hook, next) => {
+      hook(current, this.current, next)
+    }
 
+    const runQueue = (queue, iterator, complete) => {
+      function next(index) {
+        if (index >= queue.length) {
+          complete()
+          return
+        }
+        let hook = queue[index]
+        iterator(hook, () => {
+          next(index + 1)
+        })
+      }
+      next(0)
+    }
 
-    complete && complete()
+    // 路径切换的时候，调用勾子函数
+    const queue = this.router.beforeHooks
+
+    runQueue(queue, iterator, () => {
+      // 用最新的匹配结果，去更新试图
+      this.current = current
+      this.cb && this.cb(current)
+
+      complete && complete()
+    })
   }
-  
+
   // 保存回调函数
   listen(cb) {
     this.cb = cb

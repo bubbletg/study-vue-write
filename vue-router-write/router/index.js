@@ -32,6 +32,20 @@ let routes = [
 
 // use 会调用install 方法，会注册全局组件 router-link router-view
 Vue.use(VueRouter)
-export default new VueRouter({
+const router = new VueRouter({
   routes
 })
+
+router.beforeEach((to, from, next) => {
+  setTimeout(() => {
+    console.log('1111111');
+    next()
+  }, 2000)
+})
+router.beforeEach((to, from, next) => {
+  setTimeout(() => {
+    console.log("2222222")
+    next()
+  }, 3000)
+})
+export default router
