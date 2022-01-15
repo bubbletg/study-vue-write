@@ -41,6 +41,10 @@ class VueRouter {
   match(location) {
     return this.matcher.match(location)
   }
+  push(location) {
+    // const history = this.history
+    window.location.hash = location
+  }
 }
 
 VueRouter.install = install
