@@ -6,6 +6,7 @@ import Home from "../views/home.vue"
 import About from "../views/about.vue"
 import AboutA from "../views/about/a.vue"
 import AboutB from "../views/about/b.vue"
+import AboutBC from "../views/about/c.vue"
 
 let routes = [
   {
@@ -20,7 +21,11 @@ let routes = [
         path: "a",
         component: AboutA
       },
-      { path: "b", component: AboutB }
+      {
+        path: "b",
+        component: AboutB,
+        children: [{ path: "c", component: AboutBC }]
+      }
     ]
   }
 ]

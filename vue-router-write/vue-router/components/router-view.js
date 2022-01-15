@@ -4,7 +4,6 @@ export default {
   render(h, { parent, data }) {
     let route = parent.$route
     let depth = 0
-
     data.routerView = true // 标识路由属性
 
     while (parent) {
@@ -22,3 +21,4 @@ export default {
     return h(record.component, data)
   }
 }
+

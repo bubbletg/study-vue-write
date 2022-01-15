@@ -11,7 +11,18 @@
 </template>
 
 <script>
-export default {}
+export default {
+  data() {
+    return {
+      a: 111
+    }
+  },
+  methods: {
+    mounted(){
+
+    }
+  }
+}
 </script>
 
 <style></style>
