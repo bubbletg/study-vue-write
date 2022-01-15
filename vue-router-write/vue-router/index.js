@@ -20,7 +20,7 @@ class VueRouter {
         break
     }
   }
-  init() {
+  init(app) {
     // 这里的app 是最外层的 vue 实例
 
     const history = this.history
@@ -30,8 +30,13 @@ class VueRouter {
     // 跳转路径
     // transitionTo 跳转逻辑
     // getCurrentLocation hash 才有
-    // setupHashListener hash 监听 
+    // setupHashListener hash 监听
     history.transitionTo(history.getCurrentLocation(), setupHashListener)
+
+    history.listen(route => {
+      //app._route 一更新，就会让视图更新
+      app._route = route
+    })
   }
   match(location) {
     return this.matcher.match(location)

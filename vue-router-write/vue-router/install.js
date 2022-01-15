@@ -20,6 +20,9 @@ const install = function (_Vue) {
         this._router = this.$options.router
 
         this._router.init(this)
+        // 把 this 添加一个 属性 _route,并且是响应式的 
+        Vue.util.defineReactive(this, '_route', this._router.history.current)
+        
       } else {
         // 子实例，拿到父实例
         this._routerRoot = this.$parent && this.$parent._routerRoot

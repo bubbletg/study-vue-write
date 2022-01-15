@@ -21,10 +21,29 @@ export default class History {
       path: "/"
     })
   }
+
   transitionTo(location, complete) {
     // 获取当前路径，匹配对应的记录，当路径变化时候获取对应记录
-    this.current = this.router.match(location)
+    let current = this.router.match(location)
+    // 放在重复点击，重复渲染
+    // 匹配相同就不需要再次跳转
+    if (
+      location === this.current.path &&
+      this.current.matched.location === current.matched.length
+    ) {
+      return
+    }
+
+    // 用最新的匹配结果，去更新试图
+    this.current = current
+    this.cb && this.cb(current)
+
 
     complete && complete()
+  }
+  
+  // 保存回调函数
+  listen(cb) {
+    this.cb = cb
   }
 }
