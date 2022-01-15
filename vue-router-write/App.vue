@@ -10,7 +10,12 @@
 </template>
 
 <script>
-export default {}
+export default {
+  name: "app",
+  mounted() {
+    console.log(this.$router, this.$route)
+  }
+}
 </script>
 
 <style></style>
