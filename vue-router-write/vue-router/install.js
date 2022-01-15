@@ -40,3 +40,4 @@ const install = function (_Vue) {
 }
 
 export default install
+
