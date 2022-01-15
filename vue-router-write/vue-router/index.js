@@ -1,15 +1,40 @@
 import install from "./install"
 import createMatcher from "./create-matcher"
+import BrowserHistory from "./history/browserHistory"
+import HashHistory from "./history/hashHistory"
 
 class VueRouter {
   constructor(options) {
     const routes = options.routes || []
-
     // 创建匹配器的过程
-    this.matcher  =  createMatcher(routes)
+    this.matcher = createMatcher(routes)
+
+    // 创建历史管理
+    this.mode = options.mode || "hash"
+    switch (this.mode) {
+      case "hash":
+        this.history = new HashHistory(this)
+        break
+      case "history":
+        this.history = new BrowserHistory(this)
+        break
+    }
   }
-  init(app) { // 这里的app 是最外层的 vue 实例
-  console.log("🚀 ~ file: index.js ~ line 12 ~ VueRouter ~ init ~ app", app)
+  init() {
+    // 这里的app 是最外层的 vue 实例
+
+    const history = this.history
+    let setupHashListener = () => {
+      history.setupListener()
+    }
+    // 跳转路径
+    // transitionTo 跳转逻辑
+    // getCurrentLocation hash 才有
+    // setupHashListener hash 监听 
+    history.transitionTo(history.getCurrentLocation(), setupHashListener)
+  }
+  match(location) {
+    return this.matcher.match(location)
   }
 }
 
