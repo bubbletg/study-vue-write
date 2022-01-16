@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <div>我得名字： {{ $store.getters.getName }}</div>
+    <!-- <div>我得名字： {{ $store.getters.getName }}</div>
     <div>我得----： {{ $store.state.age }}</div>
     <button @click="$store.commit('changeName','这是新名字')">同步更新,年纪加 11</button>
-    <button @click="$store.dispatch('changeAge')">异步更新</button>
+    <button @click="$store.dispatch('changeAge')">异步更新</button> -->
   </div>
 </template>
 

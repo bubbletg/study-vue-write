@@ -5,7 +5,9 @@ import store from './store';
 
 Vue.config.productionTip = false;
 
-new Vue({
+const vm = new Vue({
   render: (h) => h(App),
   store,
 }).$mount('#app');
+
+console.log('vm', vm);
