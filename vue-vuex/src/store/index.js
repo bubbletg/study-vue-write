@@ -8,6 +8,7 @@ export default new Store({
   state: {
     age: '100',
     name: 'BubbleTg',
+    a:'aaaa',
   },
   // 获得属性
   getters: {
@@ -17,7 +18,8 @@ export default new Store({
 
     // 是一个计算属性
     getName(state) {
-      return `${state.name}1111111`;
+      console.log('1111111aaaaaaaa');
+      return `${state.name}----${state.age}`;
     },
   },
   // 唯一改变状态的方法

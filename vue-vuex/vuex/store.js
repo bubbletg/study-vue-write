@@ -1,12 +1,25 @@
+import { forEach } from './utils';
 let Vue = null;
 
 class Store {
   constructor(options) {
-    const { state } = options;
+    const { state, getters } = options;
+
+    this.getters = {};
+    const computed = {};
+
+    forEach(getters, (fn, key) => {
+      computed[key] = () => fn(this.state);
+      Object.defineProperty(this.getters, key, {
+        get: () => this._vm[key],
+      });
+    });
+
     this._vm = new Vue({
       data: {
         $$state: state,
       },
+      computed,
     });
   }
   get state() {
