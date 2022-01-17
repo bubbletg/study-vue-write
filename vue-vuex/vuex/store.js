@@ -3,7 +3,7 @@ let Vue = null;
 
 class Store {
   constructor(options) {
-    const { state, getters } = options;
+    const { state, getters, mutations, actions } = options;
 
     this.getters = {};
     const computed = {};
@@ -21,7 +21,27 @@ class Store {
       },
       computed,
     });
+
+    // 采用发布订阅模式， 将用户定义的 mutation 和action 保存起来，当用户调用 commit 时，就找 订阅的 mutation ,调用 dispatch 就找 actions 方法
+
+    this._mutations = {};
+    this._actions = {};
+
+    forEach(mutations, (fn, type) => {
+      this._mutations[type] = (payload) => fn.call(this, this.state, payload);
+    });
+    forEach(actions, (fn, type) => {
+      this._actions[type] = (payload) => fn.call(this, this, payload);
+    });
   }
+  commit = (type, payload) => {
+    this._mutations[type](payload);
+  };
+
+  dispatch = (type, payload) => {
+    this._actions[type](payload);
+  };
+
   get state() {
     return this._vm._data.$$state;
   }
