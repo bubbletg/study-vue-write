@@ -40,6 +40,7 @@ const store = new Store({
     changeName(state, name) {
       state.name = name;
       state.age += 11;
+      state.a += 'aaaa';
     },
   },
 

@@ -1,16 +1,17 @@
 <template>
   <div id="app">
-    <div>我得名字： {{ $store.getters.getName }}</div>
-    <div>我得----： {{ $store.state.a }}</div>
+    <div>我得名字： {{ getName }}</div>
+    <div>我得----： {{ a }}</div>
     <!-- <div>我得----： {{ $store.state.aa }}</div> -->
     <!-- <div>我得----： {{ $store.state.ba}}</div> -->
-    <button @click="$store.state.a += 1000">同步更新,年纪加 11</button>
-    <button @click="$store.commit('changeName', '这是新名字')">同步更新,年纪加 11</button>
-    <button @click="$store.dispatch('changeAge')">异步更新</button>
+    <!-- <button @click="$store.state.a += 1000">同步更新,年纪加 11</button> -->
+    <button @click="changeName('这是新名字')">同步更新,年纪加 11</button>
+    <button @click="changeAge('changeAge')">异步更新</button>
   </div>
 </template>
 
 <script>
+import { mapState, mapGetters, mapMutations, mapActions } from '../vuex';
 export default {
   name: 'App',
   data() {
@@ -18,8 +19,15 @@ export default {
       storepro: this.$store,
     };
   },
-  mounted(){
-  }
+  computed: {
+    ...mapState(['a']),
+    ...mapGetters(['getName']),
+  },
+  mounted() {},
+  methods: {
+    ...mapMutations(['changeName']),
+    ...mapActions(['changeAge']),
+  },
 };
 </script>
 
