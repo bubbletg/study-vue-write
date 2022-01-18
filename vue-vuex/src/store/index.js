@@ -15,6 +15,7 @@ function persists(store) {
 }
 
 const store = new Store({
+  strict: true, // 严格模式下，只能通过 mutation 来通信
   plugins: [persists],
   // 组件状态
   state: {

@@ -22,13 +22,17 @@ function installModule(store, rootState, path, module) {
     let parent = path.slice(0, -1).reduce((memo, current) => {
       return memo[current];
     }, store);
-    // 这个api 可以增加属性
-    Vue.set(parent, path[path.length - 1], module.state);
+    store._withCommitting(() => {
+      // 这个api 可以增加属性
+      Vue.set(parent, path[path.length - 1], module.state);
+    });
   }
   module.forEachMutation((mutation, type) => {
     store._mutations[namespace + type] = store._mutations[namespace + type] || [];
     store._mutations[namespace + type].push((payload) => {
-      mutation.call(store, getState(store, path), payload);
+      store._withCommitting(() => {
+        mutation.call(store, getState(store, path), payload);
+      });
 
       store._subscribers.forEach((subscriber) => subscriber({ mutation, type }, store.state));
     });
@@ -76,6 +80,17 @@ function resetStoreVm(store, state) {
     computed,
   });
 
+  if (store._strict) {
+    // 只要状态变化里面就执行，在 store._data.$$state 状态变化后同步执行
+    store._vm.$watch(
+      () => store._vm._data.$$state,
+      () => {
+        console.assert(store._committing, '在mutation之外更改了状态');
+      },
+      { deep: true, sync: true }
+    );
+  }
+
   // 销毁老的 vm
   if (oldVm) {
     Vue.nextTick(() => oldVm.$destroy());
@@ -94,6 +109,11 @@ class Store {
     this._wrappedGetters = {}; // 存放所有模块中的 _wrappedGetters
 
     this._subscribers = [];
+    this._strict = options.strict; // true 为严格模式
+
+    // 同步watcher
+    this._committing = false;
+
     // 安装模块
     installModule(this, state, [], this._modules.root);
 
@@ -101,11 +121,20 @@ class Store {
 
     options.plugins.forEach((plugin) => plugin(this));
   }
+  _withCommitting(fn) {
+    let committing = this._committing;
+    this._committing = true;
+    fn();
+    this._committing = committing;
+  }
+
   subscribe(fn) {
     this._subscribers.push(fn);
   }
   replaceState(newState) {
-    this._vm._data.$$state = newState;
+    this._withCommitting(() => {
+      this._vm._data.$$state = newState;
+    });
   }
   commit = (type, payload) => {
     this._mutations[type].forEach((fn) => fn(payload));
