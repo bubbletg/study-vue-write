@@ -1,49 +1,114 @@
+import ModuleCollections from './module/module-collections';
 import { forEach } from './utils';
 let Vue = null;
 
+function installModule(store, rootState, path, module) {
+  let namespace = store._modules.getNamespace(path);
+
+  // 如果子模块，需要将子模块的状态定义到根模块上
+  if (path.length > 0) {
+    let parent = path.slice(0, -1).reduce((memo, current) => {
+      return memo[current];
+    }, store);
+    // 这个api 可以增加属性
+    Vue.set(parent, path[path.length - 1], module.state);
+  }
+  module.forEachMutation((mutation, type) => {
+    store._mutations[namespace + type] = store._mutations[namespace + type] || [];
+    store._mutations[namespace + type].push((payload) => {
+      mutation.call(store, module.state, payload);
+    });
+  });
+
+  module.forEachAction((action, type) => {
+    store._actions[namespace + type] = store._actions[namespace + type] || [];
+    store._actions[namespace + type].push((payload) => {
+      action.call(store, store, payload);
+    });
+  });
+
+  module.forEachGetters((getter, key) => {
+    store._wrappedGetters[namespace + key] = () => {
+      return getter(module.state);
+    };
+  });
+
+  module.forEachChild((child, key) => {
+    installModule(store, rootState, path.concat(key), child);
+  });
+}
+
+function resetStoreVm(store, state) {
+  const wrappedGetters = store._wrappedGetters;
+
+  let oldVm = state.vm;
+  let computed = {};
+  store.getters = {};
+
+  forEach(wrappedGetters, (fn, key) => {
+    computed[key] = function () {
+      return fn();
+    };
+
+    Object.defineProperty(store.getters, key, {
+      get: () => store._vm[key],
+    });
+  });
+
+  store._vm = new Vue({
+    data: {
+      $$state: state,
+    },
+    computed,
+  });
+
+  // 销毁老的 vm
+  if (oldVm) {
+    Vue.nextTick(() => oldVm.$destroy());
+  }
+}
+
 class Store {
   constructor(options) {
-    const { state, getters, mutations, actions } = options;
+    // 收集模块，把模块转换为一颗模块书
+    this._modules = new ModuleCollections(options);
 
-    this.getters = {};
-    const computed = {};
+    let state = this._modules.root.state;
 
-    forEach(getters, (fn, key) => {
-      computed[key] = () => fn(this.state);
-      Object.defineProperty(this.getters, key, {
-        get: () => this._vm[key],
-      });
-    });
+    this._mutations = {}; // 存放所有模块中的 mutations
+    this._actions = {}; // 存放所有模块中的 _actions
+    this._wrappedGetters = {}; // 存放所有模块中的 _wrappedGetters
 
-    this._vm = new Vue({
-      data: {
-        $$state: state,
-      },
-      computed,
-    });
-
-    // 采用发布订阅模式， 将用户定义的 mutation 和action 保存起来，当用户调用 commit 时，就找 订阅的 mutation ,调用 dispatch 就找 actions 方法
-
-    this._mutations = {};
-    this._actions = {};
-
-    forEach(mutations, (fn, type) => {
-      this._mutations[type] = (payload) => fn.call(this, this.state, payload);
-    });
-    forEach(actions, (fn, type) => {
-      this._actions[type] = (payload) => fn.call(this, this, payload);
-    });
+    // 安装模块
+    installModule(this, state, [], this._modules.root);
+    debugger;
+    resetStoreVm(this, state);
+    console.log('🚀 ~ file: store.js ~ line 80 ~ Store ~ constructor ~ this', this);
   }
   commit = (type, payload) => {
-    this._mutations[type](payload);
+    this._mutations[type].forEach((fn) => fn(payload));
   };
 
   dispatch = (type, payload) => {
-    this._actions[type](payload);
+    this._actions[type].forEach((fn) => fn(payload));
   };
 
   get state() {
     return this._vm._data.$$state;
+  }
+
+  /**
+   * 注册模块
+   */
+  registerModule(path, rawModule) {
+    if (typeof path === 'string') path = [path];
+    // 模块注册
+    this._modules.register(path, rawModule);
+
+    // 安装
+    installModule(this, this.state, path, rawModule.newModule);
+    // 重新定义 getters
+    resetStoreVm(this, this.state);
   }
 }
 

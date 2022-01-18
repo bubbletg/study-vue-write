@@ -2,6 +2,8 @@
   <div id="app">
     <div>我得名字： {{ $store.getters.getName }}</div>
     <div>我得----： {{ $store.state.a }}</div>
+    <div>我得----： {{ $store.state.aa }}</div>
+    <div>我得----： {{ $store.state.ba}}</div>
     <button @click="$store.state.a += 1000">同步更新,年纪加 11</button>
     <button @click="$store.commit('changeName', '这是新名字')">同步更新,年纪加 11</button>
     <button @click="$store.dispatch('changeAge')">异步更新</button>
@@ -17,7 +19,6 @@ export default {
     };
   },
   mounted(){
-    console.log('this.$store',this);
   }
 };
 </script>
