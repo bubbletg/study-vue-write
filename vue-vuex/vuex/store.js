@@ -2,6 +2,18 @@ import ModuleCollections from './module/module-collections';
 import { forEach } from './utils';
 let Vue = null;
 
+/**
+ * 通过 path 拿到 store 最新的状态
+ * @param {*} store
+ * @param {*} path
+ * @returns
+ */
+function getState(store, path) {
+  return path.reduce((newState, current) => {
+    return newState[current];
+  }, store.state);
+}
+
 function installModule(store, rootState, path, module) {
   let namespace = store._modules.getNamespace(path);
 
@@ -16,7 +28,9 @@ function installModule(store, rootState, path, module) {
   module.forEachMutation((mutation, type) => {
     store._mutations[namespace + type] = store._mutations[namespace + type] || [];
     store._mutations[namespace + type].push((payload) => {
-      mutation.call(store, module.state, payload);
+      mutation.call(store, getState(store, path), payload);
+
+      store._subscribers.forEach((subscriber) => subscriber({ mutation, type }, store.state));
     });
   });
 
@@ -29,7 +43,7 @@ function installModule(store, rootState, path, module) {
 
   module.forEachGetters((getter, key) => {
     store._wrappedGetters[namespace + key] = () => {
-      return getter(module.state);
+      return getter(getState(store, path));
     };
   });
 
@@ -41,7 +55,7 @@ function installModule(store, rootState, path, module) {
 function resetStoreVm(store, state) {
   const wrappedGetters = store._wrappedGetters;
 
-  let oldVm = state.vm;
+  let oldVm = store.vm;
   let computed = {};
   store.getters = {};
 
@@ -79,11 +93,19 @@ class Store {
     this._actions = {}; // 存放所有模块中的 _actions
     this._wrappedGetters = {}; // 存放所有模块中的 _wrappedGetters
 
+    this._subscribers = [];
     // 安装模块
     installModule(this, state, [], this._modules.root);
-    debugger;
+
     resetStoreVm(this, state);
-    console.log('🚀 ~ file: store.js ~ line 80 ~ Store ~ constructor ~ this', this);
+
+    options.plugins.forEach((plugin) => plugin(this));
+  }
+  subscribe(fn) {
+    this._subscribers.push(fn);
+  }
+  replaceState(newState) {
+    this._vm._data.$$state = newState;
   }
   commit = (type, payload) => {
     this._mutations[type].forEach((fn) => fn(payload));

@@ -3,7 +3,19 @@ import Vuex, { Store } from '../../vuex';
 
 Vue.use(Vuex);
 
+// 持久化插件
+function persists(store) {
+  let local = localStorage.getItem('xxxxxx');
+  if (local) {
+    store.replaceState(JSON.parse(local));
+  }
+  store.subscribe((mutation, state) => {
+    localStorage.setItem('xxxxxx', JSON.stringify(state));
+  });
+}
+
 const store = new Store({
+  plugins: [persists],
   // 组件状态
   state: {
     age: '100',
@@ -100,7 +112,7 @@ store.registerModule(['ba', 'f'], {
     myAge: 100,
   },
 });
-console.log("🚀 ~ file: index.js ~ line 103 ~ store", store)
+console.log('🚀 ~ file: index.js ~ line 103 ~ store', store);
 
 export default store;
 
