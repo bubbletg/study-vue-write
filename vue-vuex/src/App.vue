@@ -2,10 +2,11 @@
   <div id="app">
     <div>我得名字： {{ getName }}</div>
     <div>我得----： {{ a }}</div>
+    <div>我得----： {{ aac }}</div>
     <!-- <div>我得----： {{ $store.state.aa }}</div> -->
     <!-- <div>我得----： {{ $store.state.ba}}</div> -->
     <!-- <button @click="$store.state.a += 1000">同步更新,年纪加 11</button> -->
-    <button @click="changeName('这是新名字')">同步更新,年纪加 11</button>
+    <button @click="(aa/getC)('这是新名字')">同步更新,年纪加 11</button>
     <button @click="changeAge('changeAge')">异步更新</button>
   </div>
 </template>
@@ -22,10 +23,13 @@ export default {
   computed: {
     ...mapState(['a']),
     ...mapGetters(['getName']),
+    ...mapState({
+      aac: state => state.aa.c,
+    })
   },
-  mounted() {},
+
   methods: {
-    ...mapMutations(['changeName']),
+    ...mapMutations(['aa/getC']),
     ...mapActions(['changeAge']),
   },
 };
