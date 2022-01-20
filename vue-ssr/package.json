@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "client:build": "webpack",
-    "client:dev": "webpack-dev-server"
+    "client:build": "webpack --config build/webpack.config.client.js",
+    "client:dev": "webpack-dev-server --config build/webpack.config.client.js",
+    "server:build": "webpack --config build/webpack.config.server.js"
   },
   "keywords": [],
   "author": "",

@@ -1,7 +1,11 @@
 import Vue from 'vue';
 import App from './App.vue';
 
-let vm = new Vue({
-  el: '#app',
-  render: (h) => h(App),
-});
+export default () => {
+  let app = new Vue({
+    render: (h) => h(App),
+  });
+  return {
+    app,
+  };
+};
