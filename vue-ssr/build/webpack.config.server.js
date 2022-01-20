@@ -19,5 +19,5 @@ module.exports = merge(base, {
       filename: 'index-server.html',
       excludeChunks: ['server'], //不默认引入
     }),
-  ],s
+  ],
 });

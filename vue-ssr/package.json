@@ -5,9 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "client:build": "webpack --config build/webpack.config.client.js",
+    "client:build": "webpack --config build/webpack.config.client.js --watch",
     "client:dev": "webpack-dev-server --config build/webpack.config.client.js",
-    "server:build": "webpack --config build/webpack.config.server.js"
+    "server:build": "webpack --config build/webpack.config.server.js --watch",
+    "server:dev": "webpack-dev-server --config build/webpack.config.server.js",
+    "all": "concurrently \"npm run client:build\"  \"npm run server:build\""
   },
   "keywords": [],
   "author": "",
@@ -17,9 +19,11 @@
     "@babel/preset-env": "^7.16.10",
     "@koa/router": "^10.1.1",
     "babel-loader": "^8.2.3",
+    "concurrently": "^7.0.0",
     "css-loader": "^6.5.1",
     "html-webpack-plugin": "^5.5.0",
     "koa": "^2.13.4",
+    "koa-static": "^5.0.0",
     "vue": "^2.6.14",
     "vue-loader": "^15.9.8",
     "vue-server-renderer": "^2.6.14",
