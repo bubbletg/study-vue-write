@@ -1,5 +1,9 @@
 <template>
-  <div class="bar" @click="handleClick">bar</div>
+  <div class="bar" @click="handleClick">foofofofofofofofofofofofofof
+    <div>
+      啊啊啊啊啊
+    </div>
+  </div>
 </template>
 
 <script>

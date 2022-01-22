@@ -1,19 +1,14 @@
 <template>
   <div id="app">
-    <div @click="hello">{{ '22222'+  name + '1111' }}</div>
-    <Bar />
-    <Foo />
+    <div @click="hello">{{ '22222' + name + '1111' }}</div>
+    <router-link to="/foo">Foo</router-link>
+    <router-link to="/bar">Bar</router-link>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
-import Bar from './components/Bar.vue';
-import Foo from './components/Foo.vue';
 export default {
-  components: {
-    Bar,
-    Foo,
-  },
   data() {
     return {
       name: 'Bubble-App',
@@ -28,7 +23,7 @@ export default {
 </script>
 
 <style>
-#app{
-  color:red;
+#app {
+  color: red;
 }
 </style>

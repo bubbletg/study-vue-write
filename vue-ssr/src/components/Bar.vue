@@ -1,5 +1,5 @@
 <template>
-  <div class="bar-b" @click="click01">Bar</div>
+  <div class="bar-b" @click="click01"> babbasdljlsasfjlsadjflas</div>
 </template>
 
 <script>

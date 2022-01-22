@@ -2,7 +2,7 @@ const { createBundleRenderer } = require('vue-server-renderer');
 const Koa = require('koa');
 const Router = require('@koa/router');
 const path = require('path');
-const static = require('koa-static')
+const static = require('koa-static');
 
 const fs = require('fs');
 
@@ -18,16 +18,20 @@ let render = createBundleRenderer(serverBundle, {
   clientManifest,
 });
 
-router.get('/', async (ctx) => {
+// 访问不到时，访问首页
+// 最新 不能直接使用 '*' ,使用 '(.*)'
+router.get('(.*)', async (ctx) => {
   ctx.body = await new Promise((resolve, reject) => {
-    render.renderToString((err, html) => {
+    render.renderToString({ url: ctx.url }, (err, html) => {
       resolve(html);
+      if (err) {
+        reject(err);
+      }
     });
   });
 });
 
-// 静态服务
 app.use(static(path.resolve(__dirname, 'dist')));
-
 app.use(router.routes());
-app.listen(3000);
+// 静态服务
+app.listen(10086);
