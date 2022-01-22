@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div>{{ name }}</div>
+    <div @click="hello">{{ '22222'+  name + '1111' }}</div>
     <Bar />
     <Foo />
   </div>
@@ -19,7 +19,16 @@ export default {
       name: 'Bubble-App',
     };
   },
+  methods: {
+    hello() {
+      alert(1);
+    },
+  },
 };
 </script>
 
-<style></style>
+<style>
+#app{
+  color:red;
+}
+</style>

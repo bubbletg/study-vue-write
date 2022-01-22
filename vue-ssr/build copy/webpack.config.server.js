@@ -4,6 +4,7 @@ const base = require('./webpack.config.base');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const VueSSRServerPlugin = require('vue-server-renderer/server-plugin');
 
+
 // 需要打包的是服务端，打包的是给node 用的
 module.exports = merge(base, {
   mode: 'development',

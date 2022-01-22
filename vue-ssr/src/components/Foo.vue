@@ -4,6 +4,9 @@
 
 <script>
 export default {
+  beforeCreate(){
+    console.log('beforeCreate');
+  },
   methods: {
     handleClick() {
       alert(1);

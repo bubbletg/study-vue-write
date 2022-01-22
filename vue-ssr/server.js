@@ -1,23 +1,22 @@
-const Vue = require('vue');
-const VueServerRenderer = require('vue-server-renderer');
+const { createBundleRenderer } = require('vue-server-renderer');
 const Koa = require('koa');
 const Router = require('@koa/router');
 const path = require('path');
-const static = require('koa-static');
+const static = require('koa-static')
 
 const fs = require('fs');
 
 let app = new Koa();
 let router = new Router();
 
-const serverBundle = fs.readFileSync('./dist/server.bundle.js', 'utf8');
-const template = fs.readFileSync('./dist/index-server.html', 'utf8');
+const template = fs.readFileSync('./public/index-server.html', 'utf8');
+const serverBundle = require('./dist/vue-ssr-server-bundle.json');
+const clientManifest = require('./dist/vue-ssr-client-manifest.json');
 
-
-let render = VueServerRenderer.createBundleRenderer(serverBundle, {
+let render = createBundleRenderer(serverBundle, {
   template,
+  clientManifest,
 });
-
 
 router.get('/', async (ctx) => {
   ctx.body = await new Promise((resolve, reject) => {

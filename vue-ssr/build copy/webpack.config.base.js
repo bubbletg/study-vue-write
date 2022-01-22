@@ -5,10 +5,9 @@ module.exports = {
   mode: 'development',
   output: {
     filename: '[name].bundle.js',
-    publicPath: '', // 一定要设置这个
-    path: path.resolve(__dirname, '../dist'),
+    path: path.resolve(__dirname, '../dist/auto'),
   },
-  // devtool: 'source-map',
+  devtool: 'source-map',
   module: {
     rules: [
       {
