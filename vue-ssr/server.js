@@ -23,9 +23,14 @@ let render = createBundleRenderer(serverBundle, {
 router.get('(.*)', async (ctx) => {
   ctx.body = await new Promise((resolve, reject) => {
     render.renderToString({ url: ctx.url }, (err, html) => {
-      resolve(html);
       if (err) {
-        reject(err);
+        if (err.code === 404) {
+          resolve('404');
+        } else {
+          resolve('500');
+        }
+      } else {
+        resolve(html);
       }
     });
   });

@@ -9,11 +9,10 @@ export default (context) => {
     // context 就是包涵着后端的上下文
     // 是服务端调用renderToString 是第一个参数传递的信息
 
-    const { app, router } = createApp();
+    const { app, router, store } = createApp();
 
     // 设置服务器端 router 的位置
     router.push(context.url);
-
 
     router.onReady(() => {
       const matchedComponents = router.getMatchedComponents();
@@ -21,7 +20,18 @@ export default (context) => {
       if (!matchedComponents.length) {
         return reject({ code: 404 });
       }
-      resolve(app);
+
+      // 匹配路由
+      Promise.all(
+        matchedComponents.map((component) => {
+          if (component.asyncData) {
+            return component.asyncData(store);
+          }
+        })
+      ).then(() => {
+        context.state = store.state
+        resolve(app);
+      });
     }, reject);
   });
 };
