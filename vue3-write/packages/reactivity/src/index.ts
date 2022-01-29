@@ -1,7 +1,8 @@
 
-const shared = {}
-console.log('reactivity');
+import { shared } from '@vue/shared';
+const Reactivity = {}
+console.log('reactivity', shared);
 
 export {
-  shared
+  Reactivity
 }
