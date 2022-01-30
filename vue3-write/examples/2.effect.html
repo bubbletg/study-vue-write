@@ -12,20 +12,13 @@
     <script>
       let { reactive, effect } = VueReactivity;
 
-      let state = reactive({ name: 'BubbleTg', age: 25, com: { a: 1 } });
+      let state = reactive({ name: 'BubbleTg', age: 25, com: { a: 1 }, arr: [1, 2, 3, 4] });
       effect(() => {
-        app.innerHTML = state.name + ' ' + state.age + ' ';
-        effect(() => {
-          effect(() => {
-            effect(() => {
-              app.innerHTML = state.name + ' ' + state.age + ' ';
-            });
-          });
-        });
+        app.innerHTML = state.name;
       });
 
       setTimeout(() => {
-        // state.name = 'BubbleTgTTTTTTTTT';
+        state.name = 11111
       }, 3000);
     </script>
   </body>

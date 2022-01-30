@@ -1,7 +1,7 @@
-import { extend, isObject } from "@vue/shared"
+import { extend, hasChanged, hasOwn, isArray, isIntergerKey, isObject } from "@vue/shared"
 import { reactive, readonly } from "."
-import { track } from "./effect"
-import { TrackOpTypes } from "./operators"
+import { track, trigger } from "./effect"
+import { TrackOpTypes, TriggerOrType } from "./operators"
 
 
 const get = createGetter()
@@ -39,7 +39,7 @@ export const shallowReadonlyHandlers = extend({
  * @param shallow 是否浅的，浅代理
  */
 function createGetter(isReadonly = false, shallow = false) {
-  return function get(target: object, key: PropertyKey, receiver: any) {
+  return function get(target: any, key: any, receiver: any): any {
     const res = Reflect.get(target, key, receiver)
     if (!isReadonly) {
       // 收集依赖
@@ -61,12 +61,27 @@ function createGetter(isReadonly = false, shallow = false) {
  * @param isShallow 是否浅
  */
 function createSet(isShallow = false) {
-  return function set(target: object, key: PropertyKey, value: any, receiver: any) {
+  return function set(target: any, key: any, value: any, receiver: any): any {
+    const oldValue = target[key];
+    // 判断 target 的 key 是新添加的 key, 还是原来存在
+    let hasKey = (isArray(target) && isIntergerKey(key) ?
+      Number(key) < target.length
+      : hasOwn(target, key))
+
     const res = Reflect.set(target, key, value, receiver);
 
-    //排放更新
+    if (!hasKey) {
+      // 新增
+      trigger(target, TriggerOrType.ADD, key, value);
+    } else if (!hasChanged(oldValue, value)) {
+      // 修改
+      trigger(target, TriggerOrType.SET, key, value, oldValue);
+    }
+
+    //派发更新
     return res
   }
 }
+
 
 

@@ -1,3 +1,5 @@
+import { isArray, isIntergerKey } from "@vue/shared";
+import { TriggerOrType } from "./operators";
 
 interface EffectFunction extends Function {
   id: number,
@@ -56,6 +58,7 @@ const targetMap: any = new WeakMap()
 
 /**
  * 让 target 的 key 收集当前他对应的 effect 函数
+ * 依赖收集
  * @param target 响应式对象
  * @param type 类型
  * @param key target 的 key
@@ -65,7 +68,7 @@ export function track(target: object, type: any, key: any) {
     return
   }
 
-  let depsMap  = targetMap.get(target)
+  let depsMap = targetMap.get(target)
   if (!depsMap) {
     targetMap.set(target, (depsMap = new Map()))
   }
@@ -78,4 +81,59 @@ export function track(target: object, type: any, key: any) {
   if (!dep.has(activeEffect)) {
     dep.add(activeEffect)
   }
+}
+
+
+/**
+ * 找属性对应的 effect 让其执行
+ * 派发更新
+ * @param target 对象
+ * @param type 类型
+ * @param key key
+ * @param newValue 新value
+ * @param oldValue 老value
+ */
+export function trigger(target: any, type: any, key: any, newValue: any, oldValue?: any) {
+  // 没有收集依赖，effect,那就不需要任何操作
+  const depsMap = targetMap.get(target)
+  if (!depsMap) {
+    return
+  }
+  const effects = new Set()
+  const effectsAdd = (dep: unknown[]) => {
+    if (dep) {
+      dep.forEach((effect: unknown) => {
+        effects.add(effect);
+      })
+    }
+  }
+
+  // 将所有 要执行的 effect 存储在一个新的结合中，最终一起执行
+  // 1. 看是否修改为数组的长度，因为修改长度影响比较大
+  if (key === 'length' && isArray(target)) {
+    // 所有依赖更新
+    depsMap.forEach((dep: unknown[], value: string | number) => {
+      if (key === 'length' || value > newValue) {
+        // 如果修改的长度小于索引，这个索引也需要触发 effect 重新执行
+        effectsAdd(dep)
+      }
+    });
+  } else {
+    // 2. 修改
+    if (key != null) { // 这里是修改 响应式对象
+      effectsAdd(depsMap.get(key))
+    }
+
+    switch (type) {
+      case TriggerOrType.ADD:
+        // 数组添加一个索引，对长度进行依赖收集
+        if (isArray(target) && isIntergerKey(key)) {
+          effectsAdd(depsMap.get('length'))
+        }
+        break;
+    }
+  }
+  // 更新
+  effects.forEach((effect: any): any => effect())
+
 }
