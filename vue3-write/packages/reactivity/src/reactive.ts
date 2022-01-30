@@ -21,7 +21,7 @@ export function shallowReadonly(target: any) {
 
 const reactiveMap = new WeakMap()
 const readonlyMap = new WeakMap()
-export function createReactiveObject(target: any, isReadonly: boolean, basehandlers: ProxyHandler<any>) {
+export function createReactiveObject(target: any, isReadonly: boolean, basehandlers: any) {
   // 目标不是对象，没办法拦截，reactive 只能拦截对象类型
   if (!isObject(target)) {
     return target
