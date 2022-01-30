@@ -73,7 +73,7 @@ function createSet(isShallow = false) {
     if (!hasKey) {
       // 新增
       trigger(target, TriggerOrType.ADD, key, value);
-    } else if (!hasChanged(oldValue, value)) {
+    } else if (hasChanged(oldValue, value)) {
       // 修改
       trigger(target, TriggerOrType.SET, key, value, oldValue);
     }

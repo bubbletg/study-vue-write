@@ -44,4 +44,5 @@ export const isIntergerKey = (key: any) => parseInt(key) + '' === key
 export const hasOwn = (target: any, key: any) => Object.prototype.hasOwnProperty.call(target, key)
 
 
-export const hasChanged = (oldValue: any, newValue: any) => oldValue === newValue
+export const hasChanged = (oldValue: any, newValue: any) => oldValue
+  !== newValue
