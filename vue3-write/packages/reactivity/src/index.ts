@@ -1,8 +1,6 @@
-
-import { shared } from '@vue/shared';
-const Reactivity = {}
-console.log('reactivity', shared);
-
 export {
-  Reactivity
-}
+  reactive,
+  shallowReactive,
+  readonly,
+  shallowReadonly
+} from './reactive'
