@@ -11,5 +11,5 @@ export {
 } from './effect'
 
 export {
-  ref, shallowRef
+  ref, shallowRef, toRef, toRefs
 } from './ref'
