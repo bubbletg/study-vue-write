@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="../node_modules/@vue/reactivity/dist/reactivity.global.js"></script>
+    <script>
+      let { reactive, effect, ref, toRef, toRefs, computed } = VueReactivity;
+      let proxy = reactive({ name: 'BubbleTg', age: 25, com: { a: 1 } });
+      // let state = reactive({ count: 0 });
+      const age = ref(18);
+      // 计算属性，默认不执行，访问时候执行
+      const myage = computed(() => {
+        return age.value + 10;
+      });
+
+      effect(() => {
+        console.log('🚀 ~ file: 5.computed.html ~ line 22 ~ myage ~ myage', myage.value);
+      });
+
+      setTimeout(() => {
+        age.value = 100;
+      }, 3000);
+    </script>
+  </body>
+</html>

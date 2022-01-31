@@ -134,6 +134,12 @@ export function trigger(target: any, type: any, key: any, newValue: any, oldValu
     }
   }
   // 更新
-  effects.forEach((effect: any): any => effect())
+  effects.forEach((effect: any): any => {
+    if (effect.options.scheduler) {
+      effect.options.scheduler(effect)
+    } else {
+      effect()
+    }
+  })
 
 }
