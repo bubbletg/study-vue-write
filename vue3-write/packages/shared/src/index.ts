@@ -1,3 +1,5 @@
+export { ShapeFlags } from './shapeFlags'
+
 /**
  * 判断 value 是否为对象
  * @param value

@@ -1,3 +1,4 @@
+import { createVNode } from "./vnode"
 
 export function createAppAPI(render: Function) {
   /**
@@ -7,12 +8,15 @@ export function createAppAPI(render: Function) {
      */
   return function createApp(rootComponent: any, rootProps: any) {
     const app = {
+      _props: rootProps,
+      _component: rootComponent,
+      _container: null,
       mount(container: any) { // 挂载目的地
-        console.log("🚀 ~ file: index.ts ~ line 23 ~ mount ~ container", container, rootComponent, rootProps)
         // 1. 根据组件创建虚拟节点
+        const vnode = createVNode(rootComponent, rootProps)
         // 2. 将虚拟节点和容器通过render进行渲染
-        let vnode = {}
         render(vnode, container)
+        app._container = container
       }
     }
     return app

@@ -13,8 +13,14 @@
       let { createApp, h } = VueRuntimeDOM;
 
       let app = {
+        setup(props, context) {
+          console.log("🚀 ~ file: 6.runtime-dom.html ~ line 17 ~ setup ~ props, context", props, context)
+          return {};
+        },
         render(proxy) {
-          return h('div', { style: { color: 'red' } }, 'hello world');
+          console.log("🚀 ~ file: 6.runtime-dom.html ~ line 21 ~ render ~ proxy", proxy)
+          console.log(proxy.name,proxy);
+          // return h('div', { style: { color: 'red' } }, 'hello world');
         },
       };
 
