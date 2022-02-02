@@ -18,11 +18,39 @@
           //   console.log('🚀 ~ file: 6.runtime-dom.html ~ line 18 ~ return ~ proxy', proxy);
           // };
           return {
-            name:1,
-          }
+            name: 1,
+          };
         },
         render(proxy) {
-          return h('div', { style: { color: 'red' } }, 'hello world');
+          return h(
+            'div',
+            {
+              style: {
+                background: 'yellow',
+              },
+            },
+            [
+              h(
+                'div',
+                {
+                  style: {
+                    background: 'yellow',
+                  },
+                },
+                h('div', { style: { color: 'red' } }, ['hello world', 'BubbleTgTTTTTTTTT'])
+              ),
+              h(
+                'div',
+                {
+                  style: {
+                    background: 'yellow',
+                  },
+                },
+                h('div', { style: { color: 'red' } }, ['hello world', 'BubbleTgTTTTTTTTT'])
+              ),
+              h('div', { style: { color: 'red' } }, ['hello world', 'BubbleTgTTTTTTTTT']),
+            ]
+          );
         },
       };
 

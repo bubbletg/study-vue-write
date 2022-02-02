@@ -2,13 +2,24 @@ import { effect } from "@vue/reactivity";
 import { ShapeFlags } from "@vue/shared";
 import { createAppAPI } from "./apiCreateApp"
 import { createComponentInstance, setupComponent } from "./component";
+import { normalizeVNode, TEXT } from "./vnode";
 
 /**
  * createRenderer 告诉 core 怎么渲染
  * @param rendererOptions 一些 dom 操作
  * @returns 返回一个 app
  */
-export function createRenderer(rendererOptions: any) {
+export function createRenderer(options: any) {
+  const {
+    insert: hostInsert,
+    remove: hostRemove,
+    patchProp: hostPatchProp,
+    createElement: hostCreateElement,
+    createText: hostCreateText,
+    createComment: hostCreateComment,
+    setText: hostSetText,
+    setElementText: hostSetElementText,
+  } = options
 
   /**
    * 创建一个 effect 让 render 执行
@@ -22,11 +33,12 @@ export function createRenderer(rendererOptions: any) {
         const proxyToUse = instance.proxy
         const subTree = instance.subTree = instance.render.call(proxyToUse, proxyToUse)
 
-        patch(null,subTree,container)
+        patch(null, subTree, container)
         // 初次渲染
         instance.isMounted = true
       } else {
         // 更新逻辑
+        console.log('更新来yuans~~~~~~~~~~~~~~~~~');
       }
     });
   }
@@ -49,7 +61,7 @@ export function createRenderer(rendererOptions: any) {
     // 2. 把数据解析在实例上
     setupComponent(instance)
     // 3. 创建一个 effect 让 render 执行
-    setupRenderEffect(instance,container)
+    setupRenderEffect(instance, container)
 
   }
   /**
@@ -69,7 +81,7 @@ export function createRenderer(rendererOptions: any) {
    * @param n2
    * @param container
    */
-  const procesComponent = (n1: any, n2: any, container: any) => {
+  const processComponent = (n1: any, n2: any, container: any) => {
     if (n1 == null) { // 组件没有上一次的虚拟节点
       mountComponent(n2, container)
     } else {
@@ -78,17 +90,78 @@ export function createRenderer(rendererOptions: any) {
     }
   }
 
+  const mountChildren = (children: any, container: any) => {
+    for (let i = 0; i < children.length; i++) {
+      let child = normalizeVNode(children[i])
+      patch(null, child, container)
+    }
+  }
+  const mountElement = (vnode: any, container: any) => {
+    // 递归渲染
+    const { props, shapeFlag, type, children } = vnode
+    // 创建元素
+    let el = (vnode.el = hostCreateElement(type))
+    if (props) {
+      for (const key in props) {
+        // 处理 prop
+        hostPatchProp(el, key, null, props[key])
+      }
+    }
+    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+      // 插入文本,文本，直接插入
+      hostSetElementText(el, children)
+    } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+      // 是一个数组
+      mountChildren(children, el)
+    }
+    // 插入元素
+    hostInsert(el, container)
+  }
+  const updateElement = () => {
+
+  }
+  /**
+   * 处理元素
+   * @param n1
+   * @param n2
+   * @param container
+   */
+  const processElement = (n1: any, n2: any, container: any) => {
+    if (n1 == null) { // 组件没有上一次的虚拟节点
+      mountElement(n2, container)
+    } else {
+      // 组件更新流程
+      // updateElement(n1, n2, container)
+    }
+  }
+
+  // 处理文本
+  const processText = (n1: any, n2: any, container: any) => {
+    if (n1 == null) {
+      // 插入文本
+      hostInsert((n2.el = hostCreateText(n2.children)), container)
+    } else {
+    }
+  }
+
   const patch = (n1: null, n2: any, container: any) => {
-    const { shapeFlag } = n2;
-    if (shapeFlag & ShapeFlags.ELEMENT) { // 元素
-      console.log('元素')
-    } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) { // 组件
-      procesComponent(n1, n2, container)
+    const { shapeFlag, type } = n2;
+    switch (type) {
+      case TEXT:
+        // 处理文本
+        processText(n1, n2, container)
+        break;
+      default:
+        if (shapeFlag & ShapeFlags.ELEMENT) { // 元素
+          processElement(n1, n2, container)
+        } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) { // 组件
+          processComponent(n1, n2, container)
+        }
+        break
     }
   }
   const render = (vnode: any, container: any) => {
     // runtime-core 核心在该方法里面
-
     patch(null, vnode, container)
   }
   return {
