@@ -1,3 +1,4 @@
+import { effect } from "@vue/reactivity";
 import { ShapeFlags } from "@vue/shared";
 import { createAppAPI } from "./apiCreateApp"
 import { createComponentInstance, setupComponent } from "./component";
@@ -9,7 +10,25 @@ import { createComponentInstance, setupComponent } from "./component";
  */
 export function createRenderer(rendererOptions: any) {
 
-  const setupRenderEffect = () => {
+  /**
+   * 创建一个 effect 让 render 执行
+   * @param instance
+   */
+  const setupRenderEffect = (instance: any, container: any) => {
+    // 让每一个组件都有一个 effect,vue3 是组件级更新，数据变化会执行对应组件变化
+    instance.update = effect(function componentEffect() {
+      // 没有挂载，首次渲染
+      if (!instance.isMounted) {
+        const proxyToUse = instance.proxy
+        const subTree = instance.subTree = instance.render.call(proxyToUse, proxyToUse)
+
+        patch(null,subTree,container)
+        // 初次渲染
+        instance.isMounted = true
+      } else {
+        // 更新逻辑
+      }
+    });
   }
 
   /**
@@ -30,7 +49,7 @@ export function createRenderer(rendererOptions: any) {
     // 2. 把数据解析在实例上
     setupComponent(instance)
     // 3. 创建一个 effect 让 render 执行
-    setupRenderEffect()
+    setupRenderEffect(instance,container)
 
   }
   /**

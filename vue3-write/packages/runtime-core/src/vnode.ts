@@ -1,13 +1,13 @@
 import { isArray, isObject, isString, ShapeFlags } from "@vue/shared"
 
-
+export const isVnode = (v: any) => v.__v_isVNode
 /**
  * 创建虚拟节点
  * @param type 类型，用来区分是组件还是元素
  * @param props 属性
  * @param children 子
  */
-export const createVNode = (type: any, props: any, children = null) => {
+export const createVNode = (type: any, props: any, children: any = null) => {
 
   // 给虚拟节点添加一个类型
   const shapeFlag = isString(type) ? ShapeFlags.ELEMENT : isObject(type) ? ShapeFlags.STATEFUL_COMPONENT : 0

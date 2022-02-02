@@ -1,4 +1,4 @@
-import { ShapeFlags } from "@vue/shared"
+import { isFunction, isObject, ShapeFlags } from "@vue/shared"
 import { PublicInstanceProxyHandler } from "./componentPublicInstance"
 
 /**
@@ -14,7 +14,7 @@ export function createComponentInstance(vnode: any) {
     attrs: {},
     slots: {},
     setupState: {},
-    data:{},
+    data: {},
     ctx: {},
     isMounted: false, // 标识组件是否挂载过
   }
@@ -22,6 +22,10 @@ export function createComponentInstance(vnode: any) {
   return instance
 }
 
+/**
+ * 把数据解析在实例上
+ * @param instance  实例
+ */
 export function setupComponent(instance: any) {
   const { props, children } = instance.vnode
 
@@ -43,9 +47,47 @@ function setupStatefulComponent(instance: any) {
   // 2. 获取组件的类型
   const Component = instance.type
   const { setup } = Component
-  const setupcontext = createSetupContext(instance)
-  setup(instance.props, setupcontext)
-  Component.render(instance.proxy)
+  if (setup) {
+    const setupcontext = createSetupContext(instance)
+    const setupResult = setup(instance.props, setupcontext)
+    // 处理返回值
+    handleSetupResult(instance, setupResult)
+  } else {
+    finishComponentSetup(instance);
+  }
+}
+
+/**
+ * 处理 setup 执行返回值
+ * @param setupResult
+ */
+function handleSetupResult(instance: any, setupResult: any) {
+  if (isFunction(setupResult)) {
+    instance.render = setupResult
+  } else if (isObject(setupResult)) {
+    instance.setupState = setupResult
+  }
+  finishComponentSetup(instance)
+}
+
+
+
+/**
+ * 完成组件启动
+ * @param instance
+ */
+function finishComponentSetup(instance: any) {
+
+  const Component = instance.type
+  if (!instance.render) {
+    // 没有 render 函数
+    // 对 template 模版编译，产生 render 函数
+    if (Component.render && Component.template) {
+      // 模版编译
+    }
+    instance.render = Component.render
+  }
+  // 对 vue2.0 兼容，主要是 合并
 }
 
 /**
@@ -62,4 +104,5 @@ function createSetupContext(instance: any) {
     expose: () => { }
   }
 }
+
 

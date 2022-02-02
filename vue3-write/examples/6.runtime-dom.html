@@ -14,13 +14,15 @@
 
       let app = {
         setup(props, context) {
-          console.log("🚀 ~ file: 6.runtime-dom.html ~ line 17 ~ setup ~ props, context", props, context)
-          return {};
+          // return (proxy) => {
+          //   console.log('🚀 ~ file: 6.runtime-dom.html ~ line 18 ~ return ~ proxy', proxy);
+          // };
+          return {
+            name:1,
+          }
         },
         render(proxy) {
-          console.log("🚀 ~ file: 6.runtime-dom.html ~ line 21 ~ render ~ proxy", proxy)
-          console.log(proxy.name,proxy);
-          // return h('div', { style: { color: 'red' } }, 'hello world');
+          return h('div', { style: { color: 'red' } }, 'hello world');
         },
       };
 
