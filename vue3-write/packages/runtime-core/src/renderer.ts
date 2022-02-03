@@ -188,6 +188,7 @@ export function createRenderer(options: any) {
         if (nextShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
           // 两个是数组，diff 比对
           // diff 算法比对
+          patchKeyedChildren(oldChildren, newChildren, container)
         } else {
           // 没有孩子,删除老的孩子
           unmountChildren(oldChildren)
@@ -205,9 +206,115 @@ export function createRenderer(options: any) {
         }
       }
     }
+  }
 
+  // diff 算法来更新子元素
+  const patchKeyedChildren = (oldChildren: any, newChildren: any, container: any) => {
+    let i = 0;
+    let oldRIndex = oldChildren.length - 1;
+    let newRIndex = newChildren.length - 1;
 
+    // 从头向后开始比，遇到不同的就停止
+    while (i <= oldRIndex && i <= newRIndex) {
+      const oldChild = oldChildren[i];
+      const newChild = newChildren[i]
+      if (isSameVnodeType(oldChild, newChild)) {
+        patch(oldChild, newChild, container)
+      } else {
+        // 不相同，跳出
+        break;
+      }
+      i++;
+    }
+    // 从后向前
+    while (i <= oldRIndex && i <= newRIndex) {
+      const oldChild = oldChildren[oldRIndex];
+      const newChild = newChildren[newRIndex];
+      if (isSameVnodeType(oldChild, newChild)) {
+        patch(oldChild, newChild, container)
+      } else {
+        // 不相同，跳出
+        break;
+      }
+      oldRIndex--;
+      newRIndex--;
+    }
 
+    // 一方比对完成
+    // 如果 i 大于 oldRIndex,说明老的少，新的多
+    if (i > oldRIndex) {
+      // 有新增加的部分
+      if (i <= newRIndex) {
+
+        // 拿到参照物
+        const nextPos = newRIndex + 1;
+        //  nextPos < newChildren.length 为 true 向前插入，false 向后插入
+        const anchor = nextPos < newChildren.length ? newChildren[nextPos].el : null;
+
+        // 循环插入新增加的
+        while (i <= newRIndex) {
+          patch(null, newChildren[i++], container, anchor)
+        }
+      }
+    } else if (i >= newRIndex) { // 如果 i 小于 newRIndex,说明老的多，新的少
+      while (i <= oldRIndex) {
+        // 删除所有老的
+        unmount(oldChildren[i++])
+      }
+    } else {
+      // 乱序比较
+      // 尽可能复用，用新的元素做成一个映射表，去老的子元素中找，一样就父用，不一样就插入或者删除。
+      let s1 = i;
+      let s2 = i;
+
+      // vue3 用新的做映射表，vue2 用老的做映射表
+
+      const keyToNewIndexMap = new Map();
+      for (let j = s2; j <= newRIndex; j++) {
+        const newChild = newChildren[j];
+        keyToNewIndexMap.set(newChild.key, j);
+      }
+      // 需要patch 的数量
+      const toBePatched = newRIndex - s2 + 1;
+      // 维护 pact 过的节点
+      const newIndexToOldIndexMap = new Array(toBePatched).fill(0)
+
+      // 拿老的去 映射表里面找，看是存在复用
+      for (let k = s1; k <= oldRIndex; k++) {
+        const oldChild = oldChildren[k];
+        const newIndex = keyToNewIndexMap.get(oldChild.key)
+        if (newIndex == null) {
+          // 老节点不在新的中，删除老的
+          unmount(oldChild)
+        } else {
+          // 新的和旧的索引 关系,pacth 过的 维护下标
+          newIndexToOldIndexMap[newIndex - s2] = k + 1
+          // 新老的比对
+          patch(oldChild, newChildren[newIndex], container)
+        }
+      }
+
+      // 最长递增子序列
+      let increasingNewIndexSequence = getSequence(newIndexToOldIndexMap);
+
+      let j = increasingNewIndexSequence.length - 1;
+      for (let i = toBePatched - 1; i >= 0; i--) {
+        let currentIndex = i + s2; // 找到要插入的索引
+        let child = newChildren[currentIndex] // 节点
+        let newNextchildEl = newChildren[currentIndex + 1].el // 到下一个节点
+        const anchor = currentIndex + 1 < newChildren.length ? newNextchildEl : null
+        if (newIndexToOldIndexMap[i] == 0) {
+          //  为 0 ，说明没有被patch
+          patch(null, child, container, anchor)
+        } else {
+          if (i != increasingNewIndexSequence[j]) {
+            hostInsert(child.el, container, anchor) // 插入
+          } else {
+            j--;
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -320,4 +427,47 @@ export function createRenderer(options: any) {
   return {
     createApp: createAppAPI(render)
   }
+}
+
+
+// https://en.wikipedia.org/wiki/Longest_increasing_subsequence
+function getSequence(arr: number[]): number[] {
+  const p = arr.slice()
+  const result = [0]
+  let i, j, u, v, c
+  const len = arr.length
+  for (i = 0; i < len; i++) {
+    const arrI = arr[i]
+    if (arrI !== 0) {
+      j = result[result.length - 1]
+      if (arr[j] < arrI) {
+        p[i] = j
+        result.push(i)
+        continue
+      }
+      u = 0
+      v = result.length - 1
+      while (u < v) {
+        c = (u + v) >> 1
+        if (arr[result[c]] < arrI) {
+          u = c + 1
+        } else {
+          v = c
+        }
+      }
+      if (arrI < arr[result[u]]) {
+        if (u > 0) {
+          p[i] = result[u - 1]
+        }
+        result[u] = i
+      }
+    }
+  }
+  u = result.length
+  v = result[u - 1]
+  while (u-- > 0) {
+    result[u] = v
+    v = p[v]
+  }
+  return result
 }
