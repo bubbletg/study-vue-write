@@ -2,6 +2,7 @@ import { effect } from "@vue/reactivity";
 import { ShapeFlags } from "@vue/shared";
 import { createAppAPI } from "./apiCreateApp"
 import { createComponentInstance, setupComponent } from "./component";
+import { queueJob } from "./scheduler";
 import { normalizeVNode, TEXT } from "./vnode";
 
 /**
@@ -38,7 +39,13 @@ export function createRenderer(options: any) {
         instance.isMounted = true
       } else {
         // 更新逻辑
-        console.log('更新来yuans~~~~~~~~~~~~~~~~~');
+        console.log('更新逻辑');
+      }
+    }, {
+      // 组件更新时候先走这里， scheduler 这里逻辑
+      scheduler: (effect: any) => {
+      // 在执行 effect
+        return queueJob(effect)
       }
     });
   }

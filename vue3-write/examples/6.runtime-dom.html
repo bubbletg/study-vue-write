@@ -10,47 +10,52 @@
     <div id="app">11111111</div>
     <script src="../node_modules/@vue/runtime-dom/dist/runtime-dom.global.js"></script>
     <script>
-      let { createApp, h } = VueRuntimeDOM;
+      let { createApp, h, reactive } = VueRuntimeDOM;
 
       let app = {
         setup(props, context) {
-          // return (proxy) => {
-          //   console.log('🚀 ~ file: 6.runtime-dom.html ~ line 18 ~ return ~ proxy', proxy);
-          // };
-          return {
-            name: 1,
+          const state = reactive({ name: 'BubbleTg' });
+          const fn = () => {
+            state.name = 'Bubble 变化了';
+            state.name = 'Bubble 变化了2';
+            state.name = 'Bubble 变化了1';
+            state.name = 'Bubble 变化了23';
+            state.name = 'Bubble 变化了4';
+            state.name = 'Bubble 变化了5fdsgd';
+            state.name = 'Bubble 变化了adfasd';
           };
-        },
-        render(proxy) {
-          return h(
-            'div',
-            {
-              style: {
-                background: 'yellow',
+          return function render() {
+            return h(
+              'div',
+              {
+                style: {
+                  background: 'yellow',
+                },
+                onClick: fn,
               },
-            },
-            [
-              h(
-                'div',
-                {
-                  style: {
-                    background: 'yellow',
+              [
+                h(
+                  'div',
+                  {
+                    style: {
+                      background: 'yellow',
+                    },
                   },
-                },
-                h('div', { style: { color: 'red' } }, ['hello world', 'BubbleTgTTTTTTTTT'])
-              ),
-              h(
-                'div',
-                {
-                  style: {
-                    background: 'yellow',
+                  h('div', { style: { color: 'red' } }, state.name)
+                ),
+                h(
+                  'div',
+                  {
+                    style: {
+                      background: 'yellow',
+                    },
                   },
-                },
-                h('div', { style: { color: 'red' } }, ['hello world', 'BubbleTgTTTTTTTTT'])
-              ),
-              h('div', { style: { color: 'red' } }, ['hello world', 'BubbleTgTTTTTTTTT']),
-            ]
-          );
+                  h('div', { style: { color: 'red' } }, ['hello world', 'BubbleTgTTTTTTTTT'])
+                ),
+                h('div', { style: { color: 'red' } }, state.name),
+              ]
+            );
+          };
         },
       };
 

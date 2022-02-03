@@ -21,3 +21,4 @@ export function createApp(rootComponent: any, rootProps: any = null) {
 }
 
 export * from '@vue/runtime-core'
+export * from '@vue/reactivity'
