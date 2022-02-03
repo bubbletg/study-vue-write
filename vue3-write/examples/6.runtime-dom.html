@@ -17,15 +17,12 @@
           const state = reactive({ name: 'BubbleTg' });
           const fn = () => {
             state.name = 'Bubble 变化了';
-            state.name = 'Bubble 变化了2';
-            state.name = 'Bubble 变化了1';
-            state.name = 'Bubble 变化了23';
-            state.name = 'Bubble 变化了4';
-            state.name = 'Bubble 变化了5fdsgd';
-            state.name = 'Bubble 变化了adfasd';
           };
+          setTimeout(() => {
+            state.name = 'Bubble 变化了';
+          }, 5000);
           return function render() {
-            return h(
+            const h2 = h(
               'div',
               {
                 style: {
@@ -55,6 +52,8 @@
                 h('div', { style: { color: 'red' } }, state.name),
               ]
             );
+           const h1 = h('div', { style: { color: 'yellow' } }, state.name);
+          return state.name == 'Bubble 变化了' ? h2 : h1;
           };
         },
       };

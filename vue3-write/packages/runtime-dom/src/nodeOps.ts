@@ -16,6 +16,10 @@ export const nodeOps = {
     parent.insertBefore(child, anchor)
   },
 
+  nextSibling: (node: any) => {
+    return node.nextSibling
+  },
+
   // 查询
   querySelector: (selector: any) => document.querySelector(selector),
 
