@@ -274,6 +274,7 @@ export function createRenderer(options: any) {
         const newChild = newChildren[j];
         keyToNewIndexMap.set(newChild.key, j);
       }
+
       // 需要patch 的数量
       const toBePatched = newRIndex - s2 + 1;
       // 维护 pact 过的节点
@@ -301,8 +302,8 @@ export function createRenderer(options: any) {
       for (let i = toBePatched - 1; i >= 0; i--) {
         let currentIndex = i + s2; // 找到要插入的索引
         let child = newChildren[currentIndex] // 节点
-        let newNextchildEl = newChildren[currentIndex + 1].el // 到下一个节点
-        const anchor = currentIndex + 1 < newChildren.length ? newNextchildEl : null
+        // let newNextchildEl = newChildren[currentIndex + 1].el // 到下一个节点
+        const anchor = currentIndex + 1 < newChildren.length ? newChildren[currentIndex + 1].el : null
         if (newIndexToOldIndexMap[i] == 0) {
           //  为 0 ，说明没有被patch
           patch(null, child, container, anchor)
@@ -403,6 +404,7 @@ export function createRenderer(options: any) {
       // 把以前的删掉，换成n2
       unmount(n1);
       n1 = null;
+      patch(n1,n2, container,anchor)
     }
 
 
