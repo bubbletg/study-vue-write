@@ -7,7 +7,7 @@ import { execa } from 'execa';
 // 用于开启子进程打包
 // const execa = require('execa')
 
-const target = `runtime-dom`
+const target = `compiler-dom`
 
 build(target)
 async function build(target) {
