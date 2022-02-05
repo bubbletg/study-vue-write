@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">11111111</div>
+    <script src="../node_modules/@vue/runtime-dom/dist/runtime-dom.global.js"></script>
+    <script>
+      let {
+        createApp,
+        h,
+        reactive,
+        onBeforeMount,
+        onMounted,
+        onBeforeUpdate,
+        onUpdated,
+        getCurrentInstace,
+      } = VueRuntimeDOM;
+
+      let app = {
+        setup(props, context) {
+          const state = reactive({ name: 'BubbleTg' });
+          const instance = getCurrentInstace();
+          console.log('🚀 ~ file: 7.lifecycle.html ~ line 19 ~ setup ~ instance', instance);
+          setTimeout(() => {
+            state.name = 'Bubble 变化了';
+          }, 3000);
+          onBeforeMount(() => {
+            console.log('🚀 ~ file: 7.lifecycle.html ~ line 25 ~ onBeforeMount ~ onBeforeMount');
+          });
+          onMounted(() => {
+            console.log('onMounted');
+          });
+          onBeforeUpdate(() => {
+            console.log('onBeforeUpdate');
+          });
+          onUpdated(() => {
+            console.log('onUpdated');
+          });
+          return function render() {
+            const h2 = h(
+              'div',
+              {
+                key: 'h1',
+              },
+              [
+                h('li', { key: 'd', style: { color: 'yellow' } }, 'd'),
+                h('li', { key: 'b', style: { color: 'red' } }, 'b'),
+                h('li', { key: 'c', style: { color: 'blue' } }, 'c'),
+                h('li', { key: 'e', style: { color: 'red' } }, 'e'),
+                h('li', { key: 'f', style: { color: 'blue' } }, 'f'),
+                h('li', { key: 'g', style: { color: 'red' } }, 'g'),
+              ]
+            );
+            const h1 = h(
+              'div',
+              {
+                key: 'h1',
+                style: {
+                  color: 'red',
+                },
+              },
+              h('li', { key: 'a' }, 'a')
+            );
+            return state.name == 'Bubble 变化了' ? h2 : h1;
+          };
+        },
+      };
+
+      createApp(app, { name: 'VueRuntimeDOM', age: 12 }).mount('#app');
+    </script>
+  </body>
+</html>

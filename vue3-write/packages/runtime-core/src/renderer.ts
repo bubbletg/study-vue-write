@@ -1,6 +1,7 @@
 import { effect } from "@vue/reactivity";
 import { ShapeFlags } from "@vue/shared";
 import { createAppAPI } from "./apiCreateApp"
+import { invokeArrayFns } from "./apiLifecycle";
 import { createComponentInstance, setupComponent } from "./component";
 import { queueJob } from "./scheduler";
 import { normalizeVNode, TEXT } from "./vnode";
@@ -30,6 +31,13 @@ export function createRenderer(options: any) {
   const setupRenderEffect = (instance: any, container: any) => {
     // 让每一个组件都有一个 effect,vue3 是组件级更新，数据变化会执行对应组件变化
     instance.update = effect(function componentEffect() {
+      // 拿到生命周期勾子
+      const { bm, m, bu, u } = instance
+      // 执行生命周期勾子
+      if (bm) {
+        // beforeMount
+        invokeArrayFns(bm)
+      }
       const proxyToUse = instance.proxy
       // 没有挂载，首次渲染
       if (!instance.isMounted) {
@@ -38,11 +46,24 @@ export function createRenderer(options: any) {
         patch(null, subTree, container)
         // 初次渲染
         instance.isMounted = true
+
+        // 执行 mounted 生命周期勾子
+        if (m) {
+          invokeArrayFns(m)
+        }
       } else {
+        // beforUpdate
+        if (bu) {
+          invokeArrayFns(bu)
+        }
         // 更新逻辑
         const prevTree = instance.subTree
         const nextTree = instance.render.call(proxyToUse, proxyToUse)
         patch(prevTree, nextTree, container)
+        //  updated 生命周期勾子
+        if (u) {
+          invokeArrayFns(u)
+        }
       }
     }, {
       // 组件更新时候先走这里， scheduler 这里逻辑
@@ -404,7 +425,7 @@ export function createRenderer(options: any) {
       // 把以前的删掉，换成n2
       unmount(n1);
       n1 = null;
-      patch(n1,n2, container,anchor)
+      patch(n1, n2, container, anchor)
     }
 
 
