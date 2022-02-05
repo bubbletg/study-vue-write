@@ -17,6 +17,7 @@ export function createAppAPI(render: Function) {
         // 2. 将虚拟节点和容器通过render进行渲染
         render(vnode, container)
         app._container = container
+        return
       }
     }
     return app

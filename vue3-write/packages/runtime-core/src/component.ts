@@ -41,6 +41,18 @@ export function setupComponent(instance: any) {
 
 }
 
+// 当前组件实例
+export let currentInstance = null;
+
+export const setCurrentInstance = (instance: any) => {
+  currentInstance = instance
+}
+
+export const getCurrentInstace = () => { // 在执行 setup 方法中获取当前实例
+  return currentInstance
+}
+
+// 调用当前实例的 setup方法
 function setupStatefulComponent(instance: any) {
   // 1. 代理 传递给 render 函数的参数
   instance.proxy = new Proxy(instance.ctx, PublicInstanceProxyHandler as any)
@@ -48,8 +60,12 @@ function setupStatefulComponent(instance: any) {
   const Component = instance.type
   const { setup } = Component
   if (setup) {
+    // 当前组件实例在setup 执行完后就没了
+    currentInstance = instance
     const setupcontext = createSetupContext(instance)
     const setupResult = setup(instance.props, setupcontext)
+
+    currentInstance = null
     // 处理返回值
     handleSetupResult(instance, setupResult)
   } else {
